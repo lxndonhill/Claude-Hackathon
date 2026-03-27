@@ -32,8 +32,8 @@ This opens your browser — log in with your Claude Pro account and click Approv
 
 ### Step 3: Clone this repo
 ```bash
-git clone <your-repo-url>
-cd <your-repo-name>
+git clone https://github.com/lxndonhill/Claude-Hackathon.git
+cd Claude-Hackathon
 ```
 
 ### Step 4: Install the plugin
