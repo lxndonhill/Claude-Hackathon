@@ -110,5 +110,3 @@ npx ecc python
 **Case:** TBD — will update once revealed
 
 **Tech Stack:** TBD
-
-**Google Doc (notes):** [add link here]
