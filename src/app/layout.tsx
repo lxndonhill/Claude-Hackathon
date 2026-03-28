@@ -6,7 +6,7 @@ import { Providers } from './providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'AutismEd — Personalized Learning for Every Child',
+  title: 'Lumio — Personalized Learning for Every Child',
   description:
     'AI-powered platform helping teachers and parents create personalized learning plans for autistic children aged 5-18.',
 }

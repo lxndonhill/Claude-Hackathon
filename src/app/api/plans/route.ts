@@ -3,13 +3,22 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { generatePlanSchema } from '@/lib/validators/plan'
-import { anthropic, CLAUDE_MODEL } from '@/lib/anthropic'
+import { CLAUDE_MODEL } from '@/lib/anthropic'
 import { buildLearningPlanPrompt, SYSTEM_PROMPT } from '@/lib/prompts/learning-plan'
 import { parsePlanResponse } from '@/lib/prompts/plan-parser'
 import { z } from 'zod'
 import { ChildProfile } from '@/types/child'
+import Anthropic from '@anthropic-ai/sdk'
 
 const DAILY_PLAN_LIMIT = 10
+
+function getAnthropicClient(): Anthropic {
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!apiKey) {
+    throw new Error('ANTHROPIC_API_KEY is not set in environment variables')
+  }
+  return new Anthropic({ apiKey })
+}
 
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions)
@@ -57,9 +66,12 @@ export async function POST(req: Request) {
   }
 
   try {
+    // --- 1. Validate request body ---
     const body = await req.json()
     const data = generatePlanSchema.parse(body)
+    console.log('[plans/POST] Request validated:', { childId: data.childId, focusArea: data.focusArea })
 
+    // --- 2. Verify child ownership ---
     const child = await prisma.child.findFirst({
       where: { id: data.childId, userId: session.user.id },
     })
@@ -67,7 +79,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Child not found' }, { status: 404 })
     }
 
-    // Rate limit: 10 plans per user per day
+    // --- 3. Rate limit check ---
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const todayCount = await prisma.learningPlan.count({
@@ -83,6 +95,7 @@ export async function POST(req: Request) {
       )
     }
 
+    // --- 4. Build prompt ---
     const childProfile: ChildProfile = {
       ...child,
       strengths: JSON.parse(child.strengths),
@@ -93,8 +106,17 @@ export async function POST(req: Request) {
       createdAt: child.createdAt.toISOString(),
       updatedAt: child.updatedAt.toISOString(),
     }
-
     const userPrompt = buildLearningPlanPrompt(childProfile, data.focusArea, data.additionalContext)
+
+    // --- 5. Call Claude API ---
+    console.log('[plans/POST] Calling Claude API with model:', CLAUDE_MODEL)
+    let anthropicClient: Anthropic
+    try {
+      anthropicClient = getAnthropicClient()
+    } catch (err) {
+      console.error('[plans/POST] Anthropic client init failed:', err)
+      return NextResponse.json({ error: 'API key not configured on server' }, { status: 500 })
+    }
 
     let rawResponse = ''
     let attempt = 0
@@ -103,43 +125,74 @@ export async function POST(req: Request) {
     while (attempt < maxAttempts) {
       attempt++
       try {
-        const message = await anthropic.messages.create({
+        const message = await anthropicClient.messages.create({
           model: CLAUDE_MODEL,
-          max_tokens: 2048,
+          max_tokens: 4096,
           system: SYSTEM_PROMPT,
           messages: [{ role: 'user', content: userPrompt }],
         })
+        console.log('[plans/POST] Claude responded, stop_reason:', message.stop_reason, 'content blocks:', message.content.length)
 
         rawResponse = message.content
           .filter((c) => c.type === 'text')
           .map((c) => (c as { type: 'text'; text: string }).text)
           .join('')
 
+        console.log('[plans/POST] Raw response length:', rawResponse.length, 'preview:', rawResponse.slice(0, 120))
         break
       } catch (err) {
-        if (attempt === maxAttempts) throw err
+        const apiErr = err as { status?: number; message?: string }
+        console.error(`[plans/POST] Claude API attempt ${attempt} failed:`, {
+          status: apiErr?.status,
+          message: apiErr?.message,
+          err,
+        })
+        if (attempt === maxAttempts) {
+          const msg = apiErr?.message ?? 'Unknown Anthropic API error'
+          return NextResponse.json({ error: `Lumen API error: ${msg}` }, { status: 502 })
+        }
         await new Promise((r) => setTimeout(r, 1000 * attempt))
       }
     }
 
-    const parsed = parsePlanResponse(rawResponse)
+    // --- 6. Parse Claude response ---
+    let parsed
+    try {
+      parsed = parsePlanResponse(rawResponse)
+      console.log('[plans/POST] Plan parsed successfully, title:', parsed.title)
+    } catch (err) {
+      console.error('[plans/POST] Failed to parse plan response:', err)
+      console.error('[plans/POST] Raw response was:', rawResponse)
+      return NextResponse.json(
+        { error: 'Lumen returned an unexpected response format. Please try again.' },
+        { status: 500 }
+      )
+    }
 
-    const plan = await prisma.learningPlan.create({
-      data: {
-        childId: data.childId,
-        title: parsed.title,
-        focusArea: data.focusArea,
-        goals: JSON.stringify(parsed.goals),
-        strategies: JSON.stringify(parsed.strategies),
-        accommodations: JSON.stringify(parsed.accommodations),
-        materials: JSON.stringify(parsed.materials),
-        weeklyStructure: JSON.stringify(parsed.weeklyStructure),
-        assessmentMethods: JSON.stringify(parsed.assessmentMethods),
-        rawResponse,
-        promptUsed: userPrompt,
-        modelVersion: CLAUDE_MODEL,
-      },
-    })
+    // --- 7. Save to database ---
+    let plan
+    try {
+      plan = await prisma.learningPlan.create({
+        data: {
+          childId: data.childId,
+          title: parsed.title,
+          focusArea: data.focusArea,
+          goals: JSON.stringify(parsed.goals),
+          strategies: JSON.stringify(parsed.strategies),
+          accommodations: JSON.stringify(parsed.accommodations),
+          materials: JSON.stringify(parsed.materials),
+          weeklyStructure: JSON.stringify(parsed.weeklyStructure),
+          assessmentMethods: JSON.stringify(parsed.assessmentMethods),
+          rawResponse,
+          promptUsed: userPrompt,
+          modelVersion: CLAUDE_MODEL,
+        },
+      })
+      console.log('[plans/POST] Plan saved to DB, id:', plan.id)
+    } catch (err) {
+      console.error('[plans/POST] Database save failed:', err)
+      return NextResponse.json({ error: 'Failed to save plan to database.' }, { status: 500 })
+    }
 
     return NextResponse.json(
       {
@@ -152,12 +205,11 @@ export async function POST(req: Request) {
     )
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: err.errors }, { status: 400 })
+      const messages = err.errors.map((e) => e.message).join(', ')
+      console.error('[plans/POST] Validation error:', messages)
+      return NextResponse.json({ error: `Invalid request: ${messages}` }, { status: 400 })
     }
-    console.error('Plan generation error:', err)
-    return NextResponse.json(
-      { error: 'Failed to generate plan. Please try again.' },
-      { status: 500 }
-    )
+    console.error('[plans/POST] Unhandled error:', err)
+    return NextResponse.json({ error: 'An unexpected error occurred. Check server logs.' }, { status: 500 })
   }
 }

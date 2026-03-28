@@ -54,7 +54,7 @@ export default function RegisterPage() {
         <div className="mb-8 flex flex-col items-center">
           <div className="mb-3 flex items-center gap-2">
             <BookOpen className="h-7 w-7 text-blue-600" />
-            <span className="text-xl font-bold text-gray-900">AutismEd</span>
+            <span className="text-xl font-bold text-gray-900">Lumio</span>
           </div>
         </div>
         <Card>
