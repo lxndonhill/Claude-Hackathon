@@ -105,8 +105,6 @@ npx ecc python
 
 ---
 
-**USE THIS TOKEN FOR PASSWORD** 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
-
 ## Project Info
 
 **Case:** TBD — will update once revealed
