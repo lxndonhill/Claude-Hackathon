@@ -1,101 +1,100 @@
-import Image from "next/image";
+import Link from 'next/link'
+import { BookOpen, Brain, Calendar, BarChart3, CheckCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+        <div className="flex items-center gap-2">
+          <BookOpen className="h-7 w-7 text-blue-600" />
+          <span className="text-xl font-bold text-gray-900">AutismEd</span>
         </div>
+        <div className="flex items-center gap-3">
+          <Link href="/login">
+            <Button variant="ghost">Sign in</Button>
+          </Link>
+          <Link href="/register">
+            <Button>Get started free</Button>
+          </Link>
+        </div>
+      </header>
+
+      <main>
+        <section className="mx-auto max-w-4xl px-6 py-20 text-center">
+          <div className="mb-4 inline-flex items-center rounded-full bg-blue-100 px-4 py-1.5 text-sm font-medium text-blue-700">
+            AI-Powered Autism Education
+          </div>
+          <h1 className="mb-6 text-5xl font-bold leading-tight text-gray-900">
+            Personalized learning plans for every child
+          </h1>
+          <p className="mb-10 text-xl leading-relaxed text-gray-600">
+            AutismEd helps teachers and parents of autistic children ages 5-18 create
+            AI-powered learning plans, build visual schedules, and track meaningful progress.
+          </p>
+          <div className="flex items-center justify-center gap-4">
+            <Link href="/register">
+              <Button size="lg" className="px-8">Start for free</Button>
+            </Link>
+            <Link href="/login">
+              <Button size="lg" variant="outline" className="px-8">Sign in</Button>
+            </Link>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-6 pb-24">
+          <div className="grid gap-8 md:grid-cols-3">
+            <div className="rounded-2xl border bg-white p-8 shadow-sm">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100">
+                <Brain className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold text-gray-900">AI Learning Plans</h3>
+              <p className="text-gray-600">
+                Generate personalized, evidence-based learning plans in seconds using each child&apos;s
+                unique profile — strengths, challenges, sensory preferences, and interests.
+              </p>
+            </div>
+            <div className="rounded-2xl border bg-white p-8 shadow-sm">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-green-100">
+                <Calendar className="h-6 w-6 text-green-600" />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold text-gray-900">Visual Schedules</h3>
+              <p className="text-gray-600">
+                Build structured daily and weekly visual schedules with icons and color-coding.
+                Print them for classroom walls or home use.
+              </p>
+            </div>
+            <div className="rounded-2xl border bg-white p-8 shadow-sm">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100">
+                <BarChart3 className="h-6 w-6 text-purple-600" />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold text-gray-900">Progress Tracking</h3>
+              <p className="text-gray-600">
+                Log progress toward goals and visualize growth over time with charts.
+                Celebrate milestones and share reports at IEP meetings.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-16 rounded-2xl bg-blue-50 p-10 text-center">
+            <h2 className="mb-4 text-2xl font-bold text-gray-900">Built for educators and families</h2>
+            <div className="mx-auto grid max-w-2xl gap-3 text-left">
+              {[
+                'Evidence-based strategies from autism specialists',
+                'Adapts to DSM-5 support levels (1, 2, and 3)',
+                'Leverages special interests to boost engagement',
+                'Sensory-informed scheduling and accommodations',
+                'Print-ready plans and schedules',
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-2">
+                  <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
+                  <span className="text-gray-700">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
-  );
+  )
 }
