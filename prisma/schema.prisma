@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         String   @default("TEACHER")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  children     Child[]
+}
+
+model Child {
+  id                 String          @id @default(cuid())
+  userId             String
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name               String
+  dateOfBirth        DateTime
+  ageGroup           String
+  diagnosisDetails   String?
+  supportLevel       String          @default("LEVEL_1")
+  strengths          String          @default("[]")
+  challenges         String          @default("[]")
+  sensoryPreferences String          @default("{\"avoids\":[],\"seeks\":[]}")
+  communicationStyle String          @default("VERBAL")
+  learningStyle      String          @default("VISUAL")
+  interests          String          @default("[]")
+  notes              String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  learningPlans      LearningPlan[]
+  schedules          Schedule[]
+  progressEntries    ProgressEntry[]
+}
+
+model LearningPlan {
+  id                String          @id @default(cuid())
+  childId           String
+  child             Child           @relation(fields: [childId], references: [id], onDelete: Cascade)
+  title             String
+  focusArea         String
+  goals             String          @default("[]")
+  strategies        String          @default("[]")
+  accommodations    String          @default("[]")
+  materials         String          @default("[]")
+  weeklyStructure   String          @default("{}")
+  assessmentMethods String          @default("[]")
+  rawResponse       String
+  promptUsed        String
+  modelVersion      String          @default("claude-sonnet-4-6")
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  progressEntries   ProgressEntry[]
+}
+
+model Schedule {
+  id         String   @id @default(cuid())
+  childId    String
+  child      Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  title      String
+  dayOfWeek  String
+  blocks     String   @default("[]")
+  isTemplate Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ProgressEntry {
+  id              String        @id @default(cuid())
+  childId         String
+  child           Child         @relation(fields: [childId], references: [id], onDelete: Cascade)
+  planId          String?
+  plan            LearningPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+  goalDescription String
+  rating          Int
+  notes           String?
+  date            DateTime
+  createdAt       DateTime      @default(now())
+}
