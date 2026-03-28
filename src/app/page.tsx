@@ -8,7 +8,7 @@ export default function LandingPage() {
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <div className="flex items-center gap-2">
           <BookOpen className="h-7 w-7 text-blue-600" />
-          <span className="text-xl font-bold text-gray-900">AutismEd</span>
+          <span className="text-xl font-bold text-gray-900">Lumio</span>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/login">
@@ -23,13 +23,13 @@ export default function LandingPage() {
       <main>
         <section className="mx-auto max-w-4xl px-6 py-20 text-center">
           <div className="mb-4 inline-flex items-center rounded-full bg-blue-100 px-4 py-1.5 text-sm font-medium text-blue-700">
-            AI-Powered Autism Education
+            AI-Powered Learning
           </div>
           <h1 className="mb-6 text-5xl font-bold leading-tight text-gray-900">
             Personalized learning plans for every child
           </h1>
           <p className="mb-10 text-xl leading-relaxed text-gray-600">
-            AutismEd helps teachers and parents of autistic children ages 5-18 create
+            Lumio helps teachers and parents of autistic children ages 5-18 create
             AI-powered learning plans, build visual schedules, and track meaningful progress.
           </p>
           <div className="flex items-center justify-center gap-4">

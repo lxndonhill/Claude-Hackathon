@@ -21,7 +21,7 @@ export function Sidebar() {
     <aside className="flex h-screen w-64 flex-col border-r bg-white px-4 py-6">
       <div className="mb-8 flex items-center gap-2 px-2">
         <BookOpen className="h-7 w-7 text-blue-600" />
-        <span className="text-xl font-bold text-gray-900">AutismEd</span>
+        <span className="text-xl font-bold text-gray-900">Lumio</span>
       </div>
 
       <nav className="flex-1 space-y-1">

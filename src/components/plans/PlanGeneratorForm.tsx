@@ -28,22 +28,26 @@ export function PlanGeneratorForm({ child }: Props) {
     setError('')
     setLoading(true)
 
-    const res = await fetch('/api/plans', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ childId: child.id, focusArea, additionalContext }),
-    })
+    try {
+      const res = await fetch('/api/plans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ childId: child.id, focusArea, additionalContext }),
+      })
 
-    setLoading(false)
+      if (!res.ok) {
+        const data = await res.json()
+        setError(data.error ?? 'Failed to generate plan')
+        return
+      }
 
-    if (!res.ok) {
-      const data = await res.json()
-      setError(data.error ?? 'Failed to generate plan')
-      return
+      const plan = await res.json()
+      router.push(`/dashboard/children/${child.id}/plans/${plan.id}`)
+    } catch (err) {
+      setError('Network error — please check your connection and try again')
+    } finally {
+      setLoading(false)
     }
-
-    const plan = await res.json()
-    router.push(`/dashboard/children/${child.id}/plans/${plan.id}`)
   }
 
   return (
@@ -54,7 +58,7 @@ export function PlanGeneratorForm({ child }: Props) {
             <Brain className="h-4 w-4 text-blue-600" />
             Child Profile Preview
           </CardTitle>
-          <p className="text-xs text-gray-500">This data will be sent to Claude to personalize the plan</p>
+          <p className="text-xs text-gray-500">This data will be sent to Lumen to personalize the plan</p>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -83,7 +87,7 @@ export function PlanGeneratorForm({ child }: Props) {
           )}
           {child.interests.length > 0 && (
             <div>
-              <p className="mb-1 text-gray-500">Interests (Claude will leverage these):</p>
+              <p className="mb-1 text-gray-500">Interests (Lumen will leverage these):</p>
               <div className="flex flex-wrap gap-1">
                 {child.interests.map((i) => (
                   <Badge key={i} variant="secondary" className="text-xs">{i}</Badge>
@@ -118,7 +122,7 @@ export function PlanGeneratorForm({ child }: Props) {
               id="context"
               value={additionalContext}
               onChange={(e) => setAdditionalContext(e.target.value)}
-              placeholder="Any specific goals, recent events, or context that would help Claude generate a better plan…"
+              placeholder="Any specific goals, recent events, or context that would help Lumen generate a better plan…"
               rows={3}
             />
           </div>
@@ -130,7 +134,7 @@ export function PlanGeneratorForm({ child }: Props) {
       {loading && (
         <div className="rounded-lg bg-blue-50 p-4 text-center">
           <Loader2 className="mx-auto mb-2 h-6 w-6 animate-spin text-blue-600" />
-          <p className="text-sm font-medium text-blue-700">Claude is generating your personalized plan…</p>
+          <p className="text-sm font-medium text-blue-700">Lumen is generating your personalized plan…</p>
           <p className="text-xs text-blue-500 mt-1">This takes 15-30 seconds</p>
         </div>
       )}
