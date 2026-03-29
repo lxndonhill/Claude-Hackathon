@@ -169,7 +169,7 @@ export default async function ChildDetailPage({ params }: { params: { childId: s
                   <CardContent className="flex items-center justify-between py-4">
                     <div>
                       <p className="font-semibold text-foreground">{s.title}</p>
-                      <p className="text-sm text-muted-foreground">{s.dayOfWeek}</p>
+                      <p className="text-sm text-muted-foreground">{s.dayOfWeek.charAt(0) + s.dayOfWeek.slice(1).toLowerCase()}</p>
                     </div>
                     <p className="text-sm text-muted-foreground">
                       {new Date(s.createdAt).toLocaleDateString()}

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChildProfile, CreateChildInput } from '@/types/child'
+import { ChildProfile, CreateChildInput, LearningStyle } from '@/types/child'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,6 +11,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { X } from 'lucide-react'
+
+const LEARNING_STYLE_OPTIONS: { value: LearningStyle; label: string }[] = [
+  { value: 'VISUAL', label: 'Visual' },
+  { value: 'AUDITORY', label: 'Auditory' },
+  { value: 'READING_WRITING', label: 'Reading/Writing' },
+  { value: 'HANDS_ON', label: 'Hands-on' },
+  { value: 'STRUCTURED', label: 'Structured' },
+  { value: 'FLEXIBLE', label: 'Flexible' },
+  { value: 'ONE_ON_ONE', label: 'One-on-one' },
+  { value: 'GROUP', label: 'Group' },
+]
 
 interface Props {
   child?: ChildProfile
@@ -82,6 +93,13 @@ export function ChildProfileForm({ child, onSuccess }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // Parse learningStyle — stored as comma-separated string in DB, received as array from API
+  function parseLearningStyles(raw: ChildProfile['learningStyle'] | undefined): LearningStyle[] {
+    if (!raw) return ['VISUAL']
+    if (Array.isArray(raw)) return raw as LearningStyle[]
+    return (raw as unknown as string).split(',').filter(Boolean) as LearningStyle[]
+  }
+
   const [form, setForm] = useState<CreateChildInput>({
     name: child?.name ?? '',
     dateOfBirth: child?.dateOfBirth?.slice(0, 10) ?? '',
@@ -92,13 +110,23 @@ export function ChildProfileForm({ child, onSuccess }: Props) {
     challenges: child?.challenges ?? [],
     sensoryPreferences: child?.sensoryPreferences ?? { avoids: [], seeks: [] },
     communicationStyle: child?.communicationStyle ?? 'VERBAL',
-    learningStyle: child?.learningStyle ?? 'VISUAL',
+    learningStyle: parseLearningStyles(child?.learningStyle),
     interests: child?.interests ?? [],
     notes: child?.notes ?? '',
   })
 
   function update<K extends keyof CreateChildInput>(key: K, value: CreateChildInput[K]) {
     setForm((f) => ({ ...f, [key]: value }))
+  }
+
+  function toggleLearningStyle(value: LearningStyle) {
+    const current = form.learningStyle as LearningStyle[]
+    if (current.includes(value)) {
+      if (current.length === 1) return // keep at least one selected
+      update('learningStyle', current.filter((s) => s !== value))
+    } else {
+      update('learningStyle', [...current, value])
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -174,47 +202,54 @@ export function ChildProfileForm({ child, onSuccess }: Props) {
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label>DSM-5 Support Level *</Label>
+            <Label>Support Level *</Label>
             <Select value={form.supportLevel} onValueChange={(v) => update('supportLevel', v as CreateChildInput['supportLevel'])}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="LEVEL_1">Level 1 — Requiring Support</SelectItem>
-                <SelectItem value="LEVEL_2">Level 2 — Requiring Substantial Support</SelectItem>
-                <SelectItem value="LEVEL_3">Level 3 — Requiring Very Substantial Support</SelectItem>
+                <SelectItem value="LEVEL_1">Building Independence</SelectItem>
+                <SelectItem value="LEVEL_2">Growing with Support</SelectItem>
+                <SelectItem value="LEVEL_3">Thriving with Guidance</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label>Communication Style *</Label>
-              <Select value={form.communicationStyle} onValueChange={(v) => update('communicationStyle', v as CreateChildInput['communicationStyle'])}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="VERBAL">Verbal</SelectItem>
-                  <SelectItem value="MINIMAL_VERBAL">Minimal Verbal</SelectItem>
-                  <SelectItem value="NON_VERBAL">Non-Verbal</SelectItem>
-                  <SelectItem value="AAC_USER">AAC Device User</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Learning Style *</Label>
-              <Select value={form.learningStyle} onValueChange={(v) => update('learningStyle', v as CreateChildInput['learningStyle'])}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="VISUAL">Visual</SelectItem>
-                  <SelectItem value="AUDITORY">Auditory</SelectItem>
-                  <SelectItem value="KINESTHETIC">Kinesthetic</SelectItem>
-                  <SelectItem value="READING_WRITING">Reading/Writing</SelectItem>
-                  <SelectItem value="MULTIMODAL">Multimodal</SelectItem>
-                </SelectContent>
-              </Select>
+          <div className="space-y-1.5">
+            <Label>Communication Style *</Label>
+            <Select value={form.communicationStyle} onValueChange={(v) => update('communicationStyle', v as CreateChildInput['communicationStyle'])}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="VERBAL">Verbal</SelectItem>
+                <SelectItem value="MINIMAL_VERBAL">Minimal Verbal</SelectItem>
+                <SelectItem value="NON_VERBAL">Non-Verbal</SelectItem>
+                <SelectItem value="AAC_USER">AAC Device User</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Learning Style * <span className="text-xs font-normal text-muted-foreground">(select all that apply)</span></Label>
+            <div className="grid grid-cols-2 gap-2">
+              {LEARNING_STYLE_OPTIONS.map(({ value, label }) => {
+                const checked = (form.learningStyle as LearningStyle[]).includes(value)
+                return (
+                  <label
+                    key={value}
+                    className={`flex cursor-pointer items-center gap-2 rounded-lg border p-2.5 text-sm transition-colors hover:bg-muted/50 ${
+                      checked ? 'border-primary/40 bg-primary/5 font-medium text-primary' : 'text-foreground'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleLearningStyle(value)}
+                      className="accent-primary"
+                    />
+                    {label}
+                  </label>
+                )
+              })}
             </div>
           </div>
         </CardContent>

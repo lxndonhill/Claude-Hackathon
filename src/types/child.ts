@@ -8,7 +8,15 @@ export type SupportLevel = 'LEVEL_1' | 'LEVEL_2' | 'LEVEL_3'
 
 export type CommunicationStyle = 'VERBAL' | 'MINIMAL_VERBAL' | 'NON_VERBAL' | 'AAC_USER'
 
-export type LearningStyle = 'VISUAL' | 'AUDITORY' | 'KINESTHETIC' | 'READING_WRITING' | 'MULTIMODAL'
+export type LearningStyle =
+  | 'VISUAL'
+  | 'AUDITORY'
+  | 'READING_WRITING'
+  | 'HANDS_ON'
+  | 'STRUCTURED'
+  | 'FLEXIBLE'
+  | 'ONE_ON_ONE'
+  | 'GROUP'
 
 export interface SensoryPreferences {
   avoids: string[]
@@ -27,7 +35,7 @@ export interface ChildProfile {
   challenges: string[]
   sensoryPreferences: SensoryPreferences
   communicationStyle: CommunicationStyle
-  learningStyle: LearningStyle
+  learningStyle: LearningStyle[]
   interests: string[]
   notes?: string
   createdAt: string
@@ -44,7 +52,7 @@ export interface CreateChildInput {
   challenges: string[]
   sensoryPreferences: SensoryPreferences
   communicationStyle: CommunicationStyle
-  learningStyle: LearningStyle
+  learningStyle: LearningStyle[]
   interests: string[]
   notes?: string
 }

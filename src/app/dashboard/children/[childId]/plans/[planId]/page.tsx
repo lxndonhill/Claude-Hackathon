@@ -33,9 +33,5 @@ export default async function PlanDetailPage({
     updatedAt: plan.updatedAt.toISOString(),
   }
 
-  return (
-    <div className="mx-auto max-w-4xl">
-      <PlanDisplay plan={learningPlan} />
-    </div>
-  )
+  return <PlanDisplay plan={learningPlan} />
 }

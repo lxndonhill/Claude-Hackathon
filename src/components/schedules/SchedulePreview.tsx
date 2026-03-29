@@ -27,7 +27,7 @@ export function SchedulePreview({ title, dayOfWeek, blocks, onClose }: Props) {
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
-            <span>{title} — {dayOfWeek}</span>
+            <span>{title} — {dayOfWeek.charAt(0) + dayOfWeek.slice(1).toLowerCase()}</span>
             <Button
               size="sm"
               variant="outline"

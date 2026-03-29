@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChildProfile } from '@/types/child'
 import { focusAreaValues } from '@/lib/validators/plan'
@@ -10,10 +10,40 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Brain, Loader2 } from 'lucide-react'
+import { Brain, Sparkles } from 'lucide-react'
 
 interface Props {
   child: ChildProfile
+}
+
+function LumenLoadingScreen() {
+  const messages = [
+    'Lumen is thinking…',
+    'Building your plan…',
+    'Crafting personalized strategies…',
+    'Almost ready…',
+  ]
+  const [msgIdx, setMsgIdx] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMsgIdx((i) => (i + 1) % messages.length)
+    }, 2500)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div className="flex flex-col items-center gap-4 rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center">
+      <div className="relative flex items-center justify-center">
+        <div className="absolute h-16 w-16 animate-ping rounded-full bg-primary/20" />
+        <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-primary shadow-lg shadow-primary/40">
+          <Sparkles className="h-6 w-6 animate-pulse text-white" />
+        </div>
+      </div>
+      <p className="text-base font-semibold text-primary">{messages[msgIdx]}</p>
+      <p className="text-xs text-muted-foreground">This takes 15–30 seconds</p>
+    </div>
+  )
 }
 
 export function PlanGeneratorForm({ child }: Props) {
@@ -50,6 +80,12 @@ export function PlanGeneratorForm({ child }: Props) {
     }
   }
 
+  const learningStyles = Array.isArray(child.learningStyle)
+    ? child.learningStyle
+    : typeof child.learningStyle === 'string'
+    ? (child.learningStyle as string).split(',').filter(Boolean)
+    : []
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <Card>
@@ -72,7 +108,7 @@ export function PlanGeneratorForm({ child }: Props) {
             </div>
             <div>
               <span className="text-gray-500">Learning Style:</span>{' '}
-              <span className="font-medium">{child.learningStyle}</span>
+              <span className="font-medium">{learningStyles.join(', ')}</span>
             </div>
           </div>
           {child.strengths.length > 0 && (
@@ -131,18 +167,12 @@ export function PlanGeneratorForm({ child }: Props) {
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
-      {loading && (
-        <div className="rounded-lg bg-blue-50 p-4 text-center">
-          <Loader2 className="mx-auto mb-2 h-6 w-6 animate-spin text-blue-600" />
-          <p className="text-sm font-medium text-blue-700">Lumen is generating your personalized plan…</p>
-          <p className="text-xs text-blue-500 mt-1">This takes 15-30 seconds</p>
-        </div>
-      )}
+      {loading && <LumenLoadingScreen />}
 
       <Button type="submit" disabled={loading || !focusArea} className="gap-2">
         {loading ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Sparkles className="h-4 w-4 animate-pulse" />
             Generating…
           </>
         ) : (

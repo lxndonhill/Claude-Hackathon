@@ -101,6 +101,7 @@ export async function POST(req: Request) {
       strengths: JSON.parse(child.strengths),
       challenges: JSON.parse(child.challenges),
       sensoryPreferences: JSON.parse(child.sensoryPreferences),
+      learningStyle: child.learningStyle.split(',').filter(Boolean),
       interests: JSON.parse(child.interests),
       dateOfBirth: child.dateOfBirth.toISOString(),
       createdAt: child.createdAt.toISOString(),
