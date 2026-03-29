@@ -11,7 +11,11 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-function RationaleBlock({ rationale }: { rationale: string }) {
+function RationaleBlock({ rationale, note, onNoteChange }: {
+  rationale: string
+  note?: string
+  onNoteChange?: (v: string) => void
+}) {
   const [open, setOpen] = useState(false)
   return (
     <div className="mt-2">
@@ -25,9 +29,23 @@ function RationaleBlock({ rationale }: { rationale: string }) {
         {open ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
       </button>
       {open && (
-        <p className="mt-1.5 rounded-lg bg-primary/5 p-2.5 text-xs leading-relaxed text-muted-foreground border border-primary/10">
-          {rationale}
-        </p>
+        <>
+          <p className="mt-1.5 rounded-lg bg-primary/5 p-2.5 text-xs leading-relaxed text-muted-foreground border border-primary/10">
+            {rationale}
+          </p>
+          {onNoteChange && (
+            <div className="mt-2 no-print">
+              <label className="text-xs font-semibold text-muted-foreground">Your notes</label>
+              <textarea
+                className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+                rows={2}
+                placeholder="Add your thoughts or educator notes..."
+                value={note ?? ''}
+                onChange={(e) => onNoteChange(e.target.value)}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   )
@@ -37,6 +55,8 @@ export function PlanDisplay({ plan }: { plan: LearningPlan }) {
   const [rejectedGoals, setRejectedGoals] = useState<Set<string>>(new Set())
   const [rejectedStrategies, setRejectedStrategies] = useState<Set<string>>(new Set())
   const [rejectedAccommodations, setRejectedAccommodations] = useState<Set<number>>(new Set())
+  const [goalNotes, setGoalNotes] = useState<Record<string, string>>({})
+  const [strategyNotes, setStrategyNotes] = useState<Record<string, string>>({})
 
   const toggleGoal = (id: string) =>
     setRejectedGoals((s) => {
@@ -133,7 +153,11 @@ export function PlanDisplay({ plan }: { plan: LearningPlan }) {
                         <span className="font-semibold">Timeframe:</span> {goal.timeframe}
                       </p>
                       {goal.rationale && !rejectedGoals.has(goal.id) && (
-                        <RationaleBlock rationale={goal.rationale} />
+                        <RationaleBlock
+                          rationale={goal.rationale}
+                          note={goalNotes[goal.id]}
+                          onNoteChange={(v) => setGoalNotes((n) => ({ ...n, [goal.id]: v }))}
+                        />
                       )}
                     </div>
                     <button
@@ -171,19 +195,19 @@ export function PlanDisplay({ plan }: { plan: LearningPlan }) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 items-start">
                 {plan.strategies.map((strategy) => (
                   <div
                     key={strategy.id}
                     className={cn(
-                      'rounded-xl border p-4 transition-all relative',
+                      'rounded-xl border p-4 transition-all relative min-w-0 overflow-hidden',
                       rejectedStrategies.has(strategy.id)
                         ? 'bg-muted/40 opacity-50'
                         : 'bg-secondary/30'
                     )}
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <p className={cn('font-semibold text-foreground', rejectedStrategies.has(strategy.id) && 'line-through text-muted-foreground')}>
+                      <p className={cn('font-semibold text-foreground break-words min-w-0', rejectedStrategies.has(strategy.id) && 'line-through text-muted-foreground')}>
                         {strategy.title}
                       </p>
                       <button
@@ -203,9 +227,13 @@ export function PlanDisplay({ plan }: { plan: LearningPlan }) {
                     {strategy.frequency && (
                       <Badge variant="secondary" className="mt-1 text-xs">{strategy.frequency}</Badge>
                     )}
-                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{strategy.description}</p>
+                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed break-words">{strategy.description}</p>
                     {strategy.rationale && !rejectedStrategies.has(strategy.id) && (
-                      <RationaleBlock rationale={strategy.rationale} />
+                      <RationaleBlock
+                        rationale={strategy.rationale}
+                        note={strategyNotes[strategy.id]}
+                        onNoteChange={(v) => setStrategyNotes((n) => ({ ...n, [strategy.id]: v }))}
+                      />
                     )}
                   </div>
                 ))}

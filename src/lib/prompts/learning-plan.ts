@@ -39,7 +39,7 @@ STUDENT PROFILE:
 - Age: ${age} years old (${formatAgeGroup(child.ageGroup)})
 - Support Level: ${formatSupportLevel(child.supportLevel)}
 - Communication Style: ${formatCommunicationStyle(child.communicationStyle)}
-- Learning Style: ${child.learningStyle}
+- Learning Style: ${Array.isArray(child.learningStyle) ? child.learningStyle.join(', ') : child.learningStyle}
 - Strengths: ${child.strengths.join(', ') || 'Not specified'}
 - Areas for Growth: ${child.challenges.join(', ') || 'Not specified'}
 - Sensory Profile:
@@ -119,9 +119,9 @@ function formatAgeGroup(ageGroup: string): string {
 
 function formatSupportLevel(level: string): string {
   const map: Record<string, string> = {
-    LEVEL_1: 'Level 1 — Requiring Support',
-    LEVEL_2: 'Level 2 — Requiring Substantial Support',
-    LEVEL_3: 'Level 3 — Requiring Very Substantial Support',
+    LEVEL_1: 'Building Independence',
+    LEVEL_2: 'Growing with Support',
+    LEVEL_3: 'Thriving with Guidance',
   }
   return map[level] ?? level
 }

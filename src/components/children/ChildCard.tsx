@@ -5,9 +5,9 @@ import { Badge } from '@/components/ui/badge'
 import { BookOpen, Calendar, BarChart3 } from 'lucide-react'
 
 const SUPPORT_LABELS: Record<string, string> = {
-  LEVEL_1: 'Level 1',
-  LEVEL_2: 'Level 2',
-  LEVEL_3: 'Level 3',
+  LEVEL_1: 'Building Independence',
+  LEVEL_2: 'Growing with Support',
+  LEVEL_3: 'Thriving with Guidance',
 }
 
 const SUPPORT_COLORS: Record<string, string> = {
