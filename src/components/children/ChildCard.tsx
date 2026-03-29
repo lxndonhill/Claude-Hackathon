@@ -12,8 +12,8 @@ const SUPPORT_LABELS: Record<string, string> = {
 
 const SUPPORT_COLORS: Record<string, string> = {
   LEVEL_1: 'bg-green-100 text-green-700',
-  LEVEL_2: 'bg-yellow-100 text-yellow-700',
-  LEVEL_3: 'bg-red-100 text-red-700',
+  LEVEL_2: 'bg-amber-100 text-amber-700',
+  LEVEL_3: 'bg-orange-100 text-orange-700',
 }
 
 function calculateAge(dob: string) {
@@ -29,32 +29,34 @@ export function ChildCard({ child }: { child: ChildProfile }) {
 
   return (
     <Link href={`/dashboard/children/${child.id}`}>
-      <Card className="cursor-pointer transition-shadow hover:shadow-md">
+      <Card className="card-hover cursor-pointer border-border">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
-            <CardTitle className="text-base">{child.name}</CardTitle>
+            <div>
+              <CardTitle className="text-base font-bold">{child.name}</CardTitle>
+              <p className="text-sm text-muted-foreground mt-0.5">{age} years old</p>
+            </div>
             <span
-              className={`rounded-full px-2 py-0.5 text-xs font-medium ${SUPPORT_COLORS[child.supportLevel]}`}
+              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${SUPPORT_COLORS[child.supportLevel]}`}
             >
               {SUPPORT_LABELS[child.supportLevel]}
             </span>
           </div>
-          <p className="text-sm text-gray-500">{age} years old</p>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-1 mb-3">
+          <div className="flex flex-wrap gap-1.5 mb-4">
             {child.interests.slice(0, 3).map((interest) => (
-              <Badge key={interest} variant="secondary" className="text-xs">
+              <Badge key={interest} variant="secondary" className="text-xs font-medium">
                 {interest}
               </Badge>
             ))}
             {child.interests.length > 3 && (
-              <Badge variant="secondary" className="text-xs">
-                +{child.interests.length - 3}
+              <Badge variant="secondary" className="text-xs font-medium">
+                +{child.interests.length - 3} more
               </Badge>
             )}
           </div>
-          <div className="flex items-center gap-4 text-xs text-gray-500">
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <BookOpen className="h-3 w-3" /> Plans
             </span>

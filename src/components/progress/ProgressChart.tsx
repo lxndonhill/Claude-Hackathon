@@ -79,9 +79,9 @@ export function ProgressChart({ entries }: Props) {
               tick={{ fontSize: 11 }}
             />
             <Tooltip
-              formatter={(value: number, name: string) => [
-                `${value} — ${RATING_LABELS[value] ?? ''}`,
-                name.length > 30 ? name.slice(0, 30) + '…' : name,
+              formatter={(value, name) => [
+                `${value} — ${RATING_LABELS[value as number] ?? ''}`,
+                typeof name === 'string' && name.length > 30 ? name.slice(0, 30) + '…' : name,
               ]}
             />
             <Legend

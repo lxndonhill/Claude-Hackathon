@@ -105,7 +105,8 @@ export async function POST(req: Request) {
       dateOfBirth: child.dateOfBirth.toISOString(),
       createdAt: child.createdAt.toISOString(),
       updatedAt: child.updatedAt.toISOString(),
-    }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any as ChildProfile
     const userPrompt = buildLearningPlanPrompt(childProfile, data.focusArea, data.additionalContext)
 
     // --- 5. Call Claude API ---
@@ -205,7 +206,7 @@ export async function POST(req: Request) {
     )
   } catch (err) {
     if (err instanceof z.ZodError) {
-      const messages = err.errors.map((e) => e.message).join(', ')
+      const messages = err.message
       console.error('[plans/POST] Validation error:', messages)
       return NextResponse.json({ error: `Invalid request: ${messages}` }, { status: 400 })
     }

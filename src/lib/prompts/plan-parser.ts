@@ -5,6 +5,7 @@ const planGoalSchema = z.object({
   description: z.string(),
   measurementCriteria: z.string(),
   timeframe: z.string(),
+  rationale: z.string().optional(),
 })
 
 const planStrategySchema = z.object({
@@ -12,6 +13,7 @@ const planStrategySchema = z.object({
   title: z.string(),
   description: z.string(),
   frequency: z.string().optional(),
+  rationale: z.string().optional(),
 })
 
 const weeklyStructureSchema = z.object({

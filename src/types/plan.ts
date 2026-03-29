@@ -13,6 +13,7 @@ export interface PlanGoal {
   description: string
   measurementCriteria: string
   timeframe: string
+  rationale?: string
 }
 
 export interface PlanStrategy {
@@ -20,6 +21,7 @@ export interface PlanStrategy {
   title: string
   description: string
   frequency?: string
+  rationale?: string
 }
 
 export interface WeeklyStructure {

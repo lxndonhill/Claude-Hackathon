@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'TEACHER' })
+  const [form, setForm] = useState<{ name: string; email: string; password: string; role: string }>({ name: '', email: '', password: '', role: 'TEACHER' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -49,33 +49,36 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-warm-gradient px-4 py-8">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center">
-          <div className="mb-3 flex items-center gap-2">
-            <BookOpen className="h-7 w-7 text-blue-600" />
-            <span className="text-xl font-bold text-gray-900">Lumio</span>
-          </div>
+          <Link href="/" className="mb-3 flex items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-sm">
+              <BookOpen className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <span className="text-2xl font-extrabold text-foreground">Lumio</span>
+          </Link>
         </div>
-        <Card>
+        <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Create an account</CardTitle>
-            <CardDescription>Start building personalized learning plans</CardDescription>
+            <CardTitle className="text-xl font-bold">Create an account</CardTitle>
+            <CardDescription>Start building personalized learning support plans</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="name">Full name</Label>
+                <Label htmlFor="name" className="font-semibold">Full name</Label>
                 <Input
                   id="name"
                   value={form.name}
                   onChange={(e) => update('name', e.target.value)}
                   placeholder="Jane Smith"
                   required
+                  className="h-11"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="font-semibold">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -83,10 +86,11 @@ export default function RegisterPage() {
                   onChange={(e) => update('email', e.target.value)}
                   placeholder="you@example.com"
                   required
+                  className="h-11"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="font-semibold">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -95,12 +99,13 @@ export default function RegisterPage() {
                   placeholder="Minimum 8 characters"
                   required
                   minLength={8}
+                  className="h-11"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>I am a</Label>
-                <Select value={form.role} onValueChange={(v) => update('role', v)}>
-                  <SelectTrigger>
+                <Label className="font-semibold">I am a</Label>
+                <Select value={form.role} onValueChange={(v) => update('role', v ?? 'TEACHER')}>
+                  <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -109,14 +114,14 @@ export default function RegisterPage() {
                   </SelectContent>
                 </Select>
               </div>
-              {error && <p className="text-sm text-red-600">{error}</p>}
-              <Button type="submit" className="w-full" disabled={loading}>
+              {error && <p className="rounded-lg bg-destructive/10 p-2 text-sm text-destructive">{error}</p>}
+              <Button type="submit" className="w-full h-11 font-bold" disabled={loading}>
                 {loading ? 'Creating account…' : 'Create account'}
               </Button>
             </form>
-            <p className="mt-4 text-center text-sm text-gray-600">
+            <p className="mt-4 text-center text-sm text-muted-foreground">
               Already have an account?{' '}
-              <Link href="/login" className="font-medium text-blue-600 hover:underline">
+              <Link href="/login" className="font-semibold text-primary hover:underline">
                 Sign in
               </Link>
             </p>
