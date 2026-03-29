@@ -356,8 +356,8 @@ export function PlanDisplay({ plan, childId }: { plan: LearningPlan; childId?: s
                   if (!content) return null
                   return (
                     <div key={day} className="rounded-xl bg-primary/5 p-3 border border-primary/10">
-                      <p className="mb-1 text-xs font-extrabold uppercase tracking-wide text-primary">
-                        {day}
+                      <p className="mb-1 text-xs font-extrabold tracking-wide text-primary">
+                        {day.charAt(0).toUpperCase() + day.slice(1)}
                       </p>
                       <p className="text-sm text-muted-foreground leading-relaxed">{content}</p>
                     </div>
