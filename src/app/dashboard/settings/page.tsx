@@ -3,7 +3,8 @@
 import { useTextSize } from '@/components/providers/TextSizeProvider'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { Settings, Type } from 'lucide-react'
+import { Moon, Settings, Sun, SunMoon, Type } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { useState } from 'react'
 
 type TextSize = 'small' | 'medium' | 'large'
@@ -20,8 +21,15 @@ const PREVIEW_FONT_SIZE: Record<TextSize, string> = {
   large: 'text-4xl',
 }
 
+const THEME_OPTIONS = [
+  { value: 'light', label: 'Light', icon: Sun },
+  { value: 'system', label: 'System', icon: SunMoon },
+  { value: 'dark', label: 'Dark', icon: Moon },
+] as const
+
 export default function SettingsPage() {
   const { textSize, setTextSize } = useTextSize()
+  const { theme, setTheme } = useTheme()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -43,6 +51,37 @@ export default function SettingsPage() {
         </h1>
         <p className="text-muted-foreground mt-1">Customize your Lumio experience</p>
       </div>
+
+      {/* Dark Mode */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <SunMoon className="h-4 w-4 text-primary" />
+            Appearance
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">Choose light or dark mode</p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-3">
+            {THEME_OPTIONS.map(({ value, label, icon: Icon }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setTheme(value)}
+                className={cn(
+                  'flex flex-col items-center gap-2 rounded-xl border-2 p-4 text-center transition-all',
+                  theme === value
+                    ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                    : 'border-border bg-card hover:border-primary/40 hover:bg-primary/5'
+                )}
+              >
+                <Icon className="h-6 w-6 text-foreground" />
+                <span className="text-sm font-bold text-foreground">{label}</span>
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader className="pb-3">

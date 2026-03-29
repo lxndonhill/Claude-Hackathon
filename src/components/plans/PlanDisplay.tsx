@@ -147,10 +147,10 @@ export function PlanDisplay({ plan, childId }: { plan: LearningPlan; childId?: s
                       <p className={cn('font-semibold text-foreground', rejectedGoals.has(goal.id) && 'line-through text-muted-foreground')}>
                         {goal.description}
                       </p>
-                      <p className="mt-1 text-sm text-muted-foreground">
+                      <p className="mt-1 text-sm dark:text-gray-200 text-gray-600">
                         <span className="font-semibold">Measure:</span> {goal.measurementCriteria}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm dark:text-gray-200 text-gray-600">
                         <span className="font-semibold">Timeframe:</span> {goal.timeframe}
                       </p>
                       {goal.rationale && !rejectedGoals.has(goal.id) && (
@@ -206,7 +206,7 @@ export function PlanDisplay({ plan, childId }: { plan: LearningPlan; childId?: s
                   <div
                     key={strategy.id}
                     className={cn(
-                      'rounded-xl border p-4 transition-all relative min-w-0 overflow-hidden',
+                      'rounded-xl border p-4 transition-all relative min-w-0',
                       rejectedStrategies.has(strategy.id)
                         ? 'bg-muted/40 opacity-50'
                         : 'bg-secondary/30'
@@ -236,7 +236,7 @@ export function PlanDisplay({ plan, childId }: { plan: LearningPlan; childId?: s
                       </div>
                     </div>
                     {strategy.frequency && (
-                      <Badge variant="secondary" className="mt-1 text-xs">{strategy.frequency}</Badge>
+                      <Badge variant="secondary" className="mt-1 text-xs whitespace-normal overflow-visible h-auto leading-snug">{strategy.frequency}</Badge>
                     )}
                     <p className="mt-2 text-sm text-muted-foreground leading-relaxed break-words">{strategy.description}</p>
                     {strategy.rationale && !rejectedStrategies.has(strategy.id) && (

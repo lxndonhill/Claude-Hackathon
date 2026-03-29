@@ -42,7 +42,7 @@ export function LumenChatPanel({ plan }: Props) {
   const [error, setError] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const planContext = buildPlanContext(plan)
+  const planContext = buildPlanContext(plan).slice(0, 12000)
 
   function scrollToBottom() {
     setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)

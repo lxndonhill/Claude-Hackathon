@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ShieldCheck, Lock, Brain, Trash2, ArrowRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Card, CardContent } from '@/components/ui/card'
 
 const points = [
@@ -84,8 +85,8 @@ export default function ConsentPage() {
           Continue to profile creation
           <ArrowRight className="h-4 w-4" />
         </Button>
-        <Link href="/dashboard">
-          <Button variant="ghost">Cancel</Button>
+        <Link href="/dashboard" className={cn(buttonVariants({ variant: 'ghost' }))}>
+          Cancel
         </Link>
       </div>
     </div>

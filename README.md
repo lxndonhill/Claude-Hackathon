@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Lumio
+
+AI-powered learning plan generator for educators and parents supporting children with diverse learning needs. Built with Next.js, Prisma (SQLite), and the Anthropic Claude API.
+
+## Features
+
+- **Child profiles** — track age group, support level, strengths, challenges, sensory preferences, and communication style
+- **AI learning plans** — generate personalized IEP-style plans via Claude (claude-sonnet-4-6)
+- **Lumen chat** — contextual AI assistant within each learning plan
+- **Schedules** — create and manage daily/weekly blocks per child
+- **Progress tracking** — log goal ratings and notes over time with charts
+
+---
+
+## Prerequisites
+
+- Node.js 18+
+- npm
+
+---
+
+<!-- AUTO-GENERATED -->
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server with hot reload |
+| `npm run build` | Production build with type checking |
+| `npm run start` | Run the production build locally |
+| `npm run lint` | Run ESLint |
+| `npm run seed` | Seed the database with sample data (`prisma/seed.ts`) |
+<!-- AUTO-GENERATED -->
+
+---
+
+<!-- AUTO-GENERATED -->
+## Environment Variables
+
+Copy `.env` (or create one from the values below) before running the app.
+
+| Variable | Required | Description | Example |
+|----------|----------|-------------|---------|
+| `ANTHROPIC_API_KEY` | **Yes** | Anthropic API key for Claude plan generation and chat | `sk-ant-...` |
+| `DATABASE_URL` | **Yes** | SQLite database file path | `file:./dev.db` |
+| `NEXTAUTH_SECRET` | **Yes** | Secret used to sign NextAuth JWTs (any random string) | `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | **Yes** | Canonical URL of the app | `http://localhost:3000` |
+<!-- AUTO-GENERATED -->
+
+---
+
+<!-- AUTO-GENERATED -->
+## API Routes
+
+All routes require authentication (NextAuth session) unless noted.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/api/register` | Create a new user account (unauthenticated) |
+| `GET/POST` | `/api/auth/[...nextauth]` | NextAuth authentication handlers |
+| `GET` | `/api/dashboard/today` | Fetch today's schedule blocks for the dashboard |
+| `GET` | `/api/children` | List all children for the current user |
+| `POST` | `/api/children` | Create a new child profile |
+| `GET` | `/api/children/[childId]` | Get a single child profile |
+| `PUT` | `/api/children/[childId]` | Update a child profile |
+| `DELETE` | `/api/children/[childId]` | Delete a child and all related data |
+| `GET` | `/api/plans?childId=` | List learning plans for a child |
+| `POST` | `/api/plans` | Generate a new AI learning plan via Claude |
+| `GET` | `/api/plans/[planId]` | Get a single learning plan |
+| `DELETE` | `/api/plans/[planId]` | Delete a learning plan |
+| `GET` | `/api/schedules?childId=` | List schedules for a child |
+| `POST` | `/api/schedules` | Create a new schedule |
+| `GET` | `/api/schedules/[scheduleId]` | Get a single schedule |
+| `PUT` | `/api/schedules/[scheduleId]` | Update a schedule |
+| `DELETE` | `/api/schedules/[scheduleId]` | Delete a schedule |
+| `GET` | `/api/progress?childId=` | List progress entries for a child |
+| `POST` | `/api/progress` | Create a progress entry |
+| `PUT` | `/api/progress/[entryId]` | Update a progress entry |
+| `DELETE` | `/api/progress/[entryId]` | Delete a progress entry |
+| `GET` | `/api/settings` | Get current user settings |
+| `PUT` | `/api/settings` | Update user settings (e.g. text size preference) |
+| `POST` | `/api/chat` | Send a message to Lumen (Claude) within a plan context |
+<!-- AUTO-GENERATED -->
+
+---
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# Install dependencies
+npm install
+
+# Set up environment
+cp .env .env.local   # edit values as needed
+
+# Initialize the database
+npx prisma migrate dev
+
+# (Optional) seed sample data
+npm run seed
+
+# Start dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Database
 
-## Learn More
+Uses SQLite via Prisma. Schema lives in `prisma/schema.prisma`.
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Apply migrations
+npx prisma migrate dev
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Open Prisma Studio (GUI)
+npx prisma studio
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Reset database
+npx prisma migrate reset
+```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Models:** `User` → `Child` → `LearningPlan`, `Schedule`, `ProgressEntry`

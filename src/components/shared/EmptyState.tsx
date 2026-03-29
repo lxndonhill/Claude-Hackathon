@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { LucideIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface EmptyStateProps {
   icon: LucideIcon
@@ -19,8 +20,8 @@ export function EmptyState({ icon: Icon, title, description, actionLabel, action
       <h3 className="mb-2 text-lg font-bold text-foreground">{title}</h3>
       <p className="mb-6 max-w-sm text-muted-foreground leading-relaxed">{description}</p>
       {actionLabel && actionHref && (
-        <Link href={actionHref}>
-          <Button className="font-semibold">{actionLabel}</Button>
+        <Link href={actionHref} className={cn(buttonVariants(), 'font-semibold')}>
+          {actionLabel}
         </Link>
       )}
     </div>

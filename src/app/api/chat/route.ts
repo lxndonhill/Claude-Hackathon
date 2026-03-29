@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { CLAUDE_MODEL } from '@/lib/anthropic'
 import Anthropic from '@anthropic-ai/sdk'
 import { z } from 'zod'
+
+const CLAUDE_MODEL = 'claude-haiku-4-5-20251001'
 
 const chatMessageSchema = z.object({
   role: z.enum(['user', 'assistant']),
@@ -12,7 +13,7 @@ const chatMessageSchema = z.object({
 
 const chatRequestSchema = z.object({
   messages: z.array(chatMessageSchema).min(1).max(50),
-  planContext: z.string().max(8000).optional(),
+  planContext: z.string().max(12000).optional(),
 })
 
 function getAnthropicClient(): Anthropic {
@@ -70,6 +71,8 @@ export async function POST(req: Request) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
     }
-    return NextResponse.json({ error: 'Failed to get response from Lumen' }, { status: 500 })
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[chat route]', message)
+    return NextResponse.json({ error: 'Failed to get response from Lumen', detail: message }, { status: 500 })
   }
 }

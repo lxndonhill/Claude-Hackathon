@@ -12,6 +12,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Brain, Sparkles } from 'lucide-react'
 
+const SUPPORT_LEVEL_LABELS: Record<string, string> = {
+  LEVEL_1: 'Building Independence',
+  LEVEL_2: 'Growing with Support',
+  LEVEL_3: 'Thriving with Guidance',
+}
+
+const COMMUNICATION_STYLE_LABELS: Record<string, string> = {
+  VERBAL: 'Verbal',
+  MINIMAL_VERBAL: 'Minimal Verbal',
+  NON_VERBAL: 'Non-Verbal',
+  AAC_USER: 'AAC User',
+}
+
 interface Props {
   child: ChildProfile
 }
@@ -100,11 +113,11 @@ export function PlanGeneratorForm({ child }: Props) {
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <span className="text-gray-500">Support Level:</span>{' '}
-              <span className="font-medium">{child.supportLevel.replace('_', ' ')}</span>
+              <span className="font-medium">{SUPPORT_LEVEL_LABELS[child.supportLevel] ?? child.supportLevel}</span>
             </div>
             <div>
               <span className="text-gray-500">Communication:</span>{' '}
-              <span className="font-medium">{child.communicationStyle.replace('_', ' ')}</span>
+              <span className="font-medium">{COMMUNICATION_STYLE_LABELS[child.communicationStyle] ?? child.communicationStyle}</span>
             </div>
             <div>
               <span className="text-gray-500">Learning Style:</span>{' '}

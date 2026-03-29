@@ -21,15 +21,17 @@ interface Props {
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899']
 
 export function ProgressChart({ entries }: Props) {
-  // Group entries by goal
+  // Group entries by normalized goal description (trim to merge near-duplicates)
   const goalMap = new Map<string, ProgressEntry[]>()
   for (const entry of entries) {
-    const key = entry.goalDescription
+    const key = entry.goalDescription.trim()
     if (!goalMap.has(key)) goalMap.set(key, [])
     goalMap.get(key)!.push(entry)
   }
 
+  // Use sanitized index-based keys for recharts dataKey to avoid special-character parsing
   const goals = Array.from(goalMap.keys())
+  const goalKeys = goals.map((_, i) => `goal_${i}`)
 
   // Build chart data: one row per unique date
   const dateSet = new Set(entries.map((e) => e.date.slice(0, 10)))
@@ -37,10 +39,10 @@ export function ProgressChart({ entries }: Props) {
 
   const chartData = dates.map((date) => {
     const row: Record<string, unknown> = { date }
-    for (const goal of goals) {
+    goals.forEach((goal, i) => {
       const entry = goalMap.get(goal)?.find((e) => e.date.slice(0, 10) === date)
-      row[goal] = entry?.rating ?? null
-    }
+      row[goalKeys[i]] = entry?.rating ?? null
+    })
     return row
   })
 
@@ -79,21 +81,27 @@ export function ProgressChart({ entries }: Props) {
               tick={{ fontSize: 11 }}
             />
             <Tooltip
-              formatter={(value, name) => [
-                `${value} — ${RATING_LABELS[value as number] ?? ''}`,
-                typeof name === 'string' && name.length > 30 ? name.slice(0, 30) + '…' : name,
-              ]}
+              formatter={(value, name) => {
+                const idx = goalKeys.indexOf(name as string)
+                const label = idx >= 0 ? goals[idx] : String(name)
+                return [
+                  `${value} — ${RATING_LABELS[value as number] ?? ''}`,
+                  label.length > 30 ? label.slice(0, 30) + '…' : label,
+                ]
+              }}
             />
             <Legend
-              formatter={(name: string) =>
-                name.length > 25 ? name.slice(0, 25) + '…' : name
-              }
+              formatter={(name: string) => {
+                const idx = goalKeys.indexOf(name)
+                const label = idx >= 0 ? goals[idx] : name
+                return label.length > 25 ? label.slice(0, 25) + '…' : label
+              }}
             />
-            {goals.slice(0, 6).map((goal, i) => (
+            {goalKeys.slice(0, 6).map((key, i) => (
               <Line
-                key={goal}
+                key={key}
                 type="monotone"
-                dataKey={goal}
+                dataKey={key}
                 stroke={COLORS[i % COLORS.length]}
                 strokeWidth={2}
                 dot={{ r: 4 }}

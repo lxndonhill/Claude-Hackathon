@@ -1,29 +1,32 @@
 import Link from 'next/link'
 import { BookOpen, Brain, Calendar, BarChart3, CheckCircle, Sparkles, Shield, Heart } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
+import { TryDemoButton } from '@/components/auth/TryDemoButton'
+import { cn } from '@/lib/utils'
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-warm-gradient">
-      {/* Header */}
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-        <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary shadow-sm">
-            <BookOpen className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <span className="text-xl font-extrabold text-foreground">Lumio</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link href="/login">
-            <Button variant="ghost" className="font-semibold">Sign in</Button>
-          </Link>
-          <Link href="/register">
-            <Button className="font-semibold shadow-sm">Get started free</Button>
-          </Link>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background">
 
-      <main>
+      {/* ── Section 1: Header + Hero (warm gradient) ── */}
+      <div className="bg-warm-gradient">
+        <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+          <div className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary shadow-sm">
+              <BookOpen className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <span className="text-xl font-extrabold text-foreground">Lumio</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link href="/login" className={cn(buttonVariants({ variant: 'ghost' }), 'font-semibold')}>
+              Sign in
+            </Link>
+            <Link href="/register" className={cn(buttonVariants(), 'font-semibold shadow-sm')}>
+              Get started free
+            </Link>
+          </div>
+        </header>
+
         {/* Hero */}
         <section className="relative mx-auto max-w-4xl px-6 py-20 text-center">
           {/* Decorative background orbs */}
@@ -45,27 +48,22 @@ export default function LandingPage() {
             create AI-powered learning plans, build visual schedules, and track meaningful progress.
           </p>
           <div className="animate-fade-up-4 flex flex-wrap items-center justify-center gap-4">
-            <Link href="/register">
-              <Button size="lg" className="px-8 text-base font-bold shadow-md hover:shadow-lg">
-                Start for free
-              </Button>
+            <Link href="/register" className={cn(buttonVariants({ size: 'lg' }), 'px-8 text-base font-bold shadow-md hover:shadow-lg')}>
+              Start for free
             </Link>
-            <Link href="/login?demo=true">
-              <Button size="lg" variant="outline" className="gap-2 px-8 text-base font-bold border-primary/30 hover:bg-primary/5">
-                <Sparkles className="h-4 w-4 text-primary" />
-                Try the demo
-              </Button>
-            </Link>
+            <TryDemoButton />
           </div>
           <p className="animate-fade-up-4 mt-4 text-sm text-muted-foreground">
             Demo account: <span className="font-mono font-semibold text-foreground">demo@lumio.app</span> / <span className="font-mono font-semibold text-foreground">demo1234</span>
           </p>
         </section>
+      </div>
 
-        {/* Feature cards */}
-        <section className="mx-auto max-w-6xl px-6 pb-16">
+      {/* ── Section 2: Feature cards (violet tint) ── */}
+      <div className="bg-section-violet">
+        <section className="mx-auto max-w-6xl px-6 py-16">
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="card-hover rounded-2xl border bg-white p-8 shadow-sm">
+            <div className="card-hover rounded-2xl border bg-card p-8 shadow-sm">
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
                 <Brain className="h-6 w-6 text-primary" />
               </div>
@@ -75,9 +73,9 @@ export default function LandingPage() {
                 unique profile — strengths, interests, sensory preferences, and communication style.
               </p>
             </div>
-            <div className="card-hover rounded-2xl border bg-white p-8 shadow-sm">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-green-100">
-                <Calendar className="h-6 w-6 text-green-600" />
+            <div className="card-hover rounded-2xl border bg-card p-8 shadow-sm">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/30">
+                <Calendar className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
               <h3 className="mb-2 text-lg font-bold text-foreground">Visual Schedules</h3>
               <p className="text-muted-foreground leading-relaxed">
@@ -85,7 +83,7 @@ export default function LandingPage() {
                 Print them for classroom walls or home use.
               </p>
             </div>
-            <div className="card-hover rounded-2xl border bg-white p-8 shadow-sm">
+            <div className="card-hover rounded-2xl border bg-card p-8 shadow-sm">
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
                 <BarChart3 className="h-6 w-6 text-primary" />
               </div>
@@ -96,9 +94,13 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
+        </section>
+      </div>
 
-          {/* Features list */}
-          <div className="mt-12 rounded-2xl bg-primary/5 border border-primary/10 p-10 text-center">
+      {/* ── Section 3: Features list + Trust badges (default bg) ── */}
+      <div className="bg-background">
+        <section className="mx-auto max-w-6xl px-6 py-16">
+          <div className="rounded-2xl bg-primary/5 border border-primary/10 p-10 text-center">
             <h2 className="mb-6 text-2xl font-extrabold text-foreground">Built for educators and families</h2>
             <div className="mx-auto grid max-w-2xl gap-3 text-left">
               {[
@@ -118,21 +120,21 @@ export default function LandingPage() {
 
           {/* Trust badges */}
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
-            <div className="flex items-start gap-3 rounded-xl border bg-white p-5">
+            <div className="flex items-start gap-3 rounded-xl border bg-card p-5">
               <Shield className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-500" />
               <div>
                 <p className="font-bold text-foreground text-sm">Privacy First</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Child names are never sent to AI services. Your data stays private.</p>
               </div>
             </div>
-            <div className="flex items-start gap-3 rounded-xl border bg-white p-5">
+            <div className="flex items-start gap-3 rounded-xl border bg-card p-5">
               <Heart className="mt-0.5 h-5 w-5 flex-shrink-0 text-rose-500" />
               <div>
                 <p className="font-bold text-foreground text-sm">Strengths-Based</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Every plan celebrates what a child can do, not just challenges.</p>
               </div>
             </div>
-            <div className="flex items-start gap-3 rounded-xl border bg-white p-5">
+            <div className="flex items-start gap-3 rounded-xl border bg-card p-5">
               <Brain className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
               <div>
                 <p className="font-bold text-foreground text-sm">Educator Control</p>
@@ -141,10 +143,12 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+      </div>
 
-        {/* Testimonial */}
-        <section className="mx-auto max-w-4xl px-6 pb-20">
-          <div className="rounded-2xl border bg-white p-10 text-center shadow-sm">
+      {/* ── Section 4: Testimonial (warm muted bg) ── */}
+      <div className="bg-section-warm">
+        <section className="mx-auto max-w-4xl px-6 py-20">
+          <div className="rounded-2xl border bg-card p-10 text-center shadow-sm">
             <div className="mb-5 text-4xl">✨</div>
             <blockquote className="mb-5 text-lg font-medium leading-relaxed text-foreground">
               &ldquo;In minutes, Lumio generated a plan that referenced Marcus&apos;s love of trains to
@@ -154,10 +158,10 @@ export default function LandingPage() {
             <p className="text-sm font-semibold text-muted-foreground">— Special Education Teacher, Grade 2</p>
           </div>
         </section>
-      </main>
+      </div>
 
-      {/* Footer */}
-      <footer className="border-t bg-white/60 backdrop-blur-sm px-6 py-8 text-center">
+      {/* ── Footer ── */}
+      <footer className="border-t bg-card/60 backdrop-blur-sm px-6 py-8 text-center">
         <div className="mx-auto max-w-2xl space-y-2">
           <p className="text-sm font-semibold text-foreground">
             Built with care for the 2026 Hackathon · Powered by Claude

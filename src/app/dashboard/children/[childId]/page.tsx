@@ -4,11 +4,13 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { Brain, Calendar, BarChart3, Pencil, Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { DeleteChildButton } from '@/components/children/DeleteChildButton'
 
 export default async function ChildDetailPage({ params }: { params: { childId: string } }) {
   const session = await getServerSession(authOptions)
@@ -45,12 +47,13 @@ export default async function ChildDetailPage({ params }: { params: { childId: s
           <h1 className="text-2xl font-extrabold text-foreground">{child.name}</h1>
           <p className="text-muted-foreground">{age} years old · Support {supportLabel}</p>
         </div>
-        <Link href={`/dashboard/children/${child.id}/edit`}>
-          <Button variant="outline" className="gap-2 font-semibold">
+        <div className="flex items-center gap-2">
+          <Link href={`/dashboard/children/${child.id}/edit`} className={cn(buttonVariants({ variant: 'outline' }), 'gap-2 font-semibold')}>
             <Pencil className="h-4 w-4" />
             Edit profile
-          </Button>
-        </Link>
+          </Link>
+          <DeleteChildButton childId={child.id} childName={child.name} />
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -113,10 +116,8 @@ export default async function ChildDetailPage({ params }: { params: { childId: s
 
         <TabsContent value="plans" className="mt-4 space-y-3">
           <div className="flex justify-end">
-            <Link href={`/dashboard/children/${child.id}/plans/new`}>
-              <Button size="sm" className="gap-1.5 font-semibold">
-                <Plus className="h-4 w-4" /> Generate new plan
-              </Button>
+            <Link href={`/dashboard/children/${child.id}/plans/new`} className={cn(buttonVariants({ size: 'sm' }), 'gap-1.5 font-semibold')}>
+              <Plus className="h-4 w-4" /> Generate new plan
             </Link>
           </div>
           {child.learningPlans.length === 0 ? (
@@ -148,10 +149,8 @@ export default async function ChildDetailPage({ params }: { params: { childId: s
 
         <TabsContent value="schedules" className="mt-4 space-y-3">
           <div className="flex justify-end">
-            <Link href={`/dashboard/children/${child.id}/schedules/new`}>
-              <Button size="sm" className="gap-1.5 font-semibold">
-                <Plus className="h-4 w-4" /> Create schedule
-              </Button>
+            <Link href={`/dashboard/children/${child.id}/schedules/new`} className={cn(buttonVariants({ size: 'sm' }), 'gap-1.5 font-semibold')}>
+              <Plus className="h-4 w-4" /> Create schedule
             </Link>
           </div>
           {child.schedules.length === 0 ? (
@@ -183,8 +182,8 @@ export default async function ChildDetailPage({ params }: { params: { childId: s
 
         <TabsContent value="progress" className="mt-4 space-y-3">
           <div className="flex justify-end">
-            <Link href={`/dashboard/children/${child.id}/progress`}>
-              <Button size="sm" className="font-semibold">View full progress</Button>
+            <Link href={`/dashboard/children/${child.id}/progress`} className={cn(buttonVariants({ size: 'sm' }), 'font-semibold')}>
+              View full progress
             </Link>
           </div>
           {child.progressEntries.length === 0 ? (

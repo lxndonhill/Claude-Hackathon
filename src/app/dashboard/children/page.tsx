@@ -3,7 +3,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { Plus, Users } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { ChildCard } from '@/components/children/ChildCard'
 import { EmptyState } from '@/components/shared/EmptyState'
 
@@ -31,11 +32,9 @@ export default async function ChildrenPage() {
     <div className="space-y-6 page-enter">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-extrabold text-foreground">Students</h1>
-        <Link href="/dashboard/children/new/consent">
-          <Button className="gap-2 font-semibold">
-            <Plus className="h-4 w-4" />
-            Add child
-          </Button>
+        <Link href="/dashboard/children/new/consent" className={cn(buttonVariants(), 'gap-2 font-semibold')}>
+          <Plus className="h-4 w-4" />
+          Add child
         </Link>
       </div>
 

@@ -38,7 +38,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   const crumbs = buildBreadcrumbs(pathname)
 
   return (
-    <header className="flex h-14 items-center gap-3 border-b bg-white px-4 md:px-6">
+    <header className="flex h-14 items-center gap-3 border-b bg-card px-4 md:px-6">
       {onMenuClick && (
         <button
           onClick={onMenuClick}

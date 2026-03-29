@@ -129,8 +129,16 @@ export function AddToScheduleButton({ childId, activityText }: Props) {
                 <div className="space-y-1.5">
                   <Label>Schedule</Label>
                   <Select value={selectedScheduleId} onValueChange={(v) => setSelectedScheduleId(v ?? '')}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a schedule" />
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a schedule">
+                        {schedules.find((s) => s.id === selectedScheduleId)
+                          ? (() => {
+                              const s = schedules.find((s) => s.id === selectedScheduleId)!
+                              return `${s.title} (${s.dayOfWeek.charAt(0) + s.dayOfWeek.slice(1).toLowerCase()})`
+                            })()
+                          : null
+                        }
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {schedules.map((s) => (

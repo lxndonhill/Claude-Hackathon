@@ -3,7 +3,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { Users, BookOpen, BarChart3, Plus, TrendingUp, Flame } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { Badge } from '@/components/ui/badge'
@@ -42,19 +43,17 @@ export default async function DashboardPage() {
           <h1 className="text-2xl font-extrabold text-foreground">Welcome back, {firstName} 👋</h1>
           <p className="text-muted-foreground">Here&apos;s an overview of your students</p>
         </div>
-        <Link href="/dashboard/children/new/consent">
-          <Button className="gap-2 font-semibold">
-            <Plus className="h-4 w-4" />
-            Add child
-          </Button>
+        <Link href="/dashboard/children/new/consent" className={cn(buttonVariants(), 'gap-2 font-semibold')}>
+          <Plus className="h-4 w-4" />
+          Add child
         </Link>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
-        <Card className="card-hover">
+        <Card className="card-hover card-accent-violet">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-semibold text-muted-foreground">Students</CardTitle>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15">
               <Users className="h-4 w-4 text-primary" />
             </div>
           </CardHeader>
@@ -63,11 +62,11 @@ export default async function DashboardPage() {
             <p className="text-xs text-muted-foreground mt-0.5">active profiles</p>
           </CardContent>
         </Card>
-        <Card className="card-hover">
+        <Card className="card-hover card-accent-green">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-semibold text-muted-foreground">Learning Plans</CardTitle>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100">
-              <BookOpen className="h-4 w-4 text-green-600" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30">
+              <BookOpen className="h-4 w-4 text-green-600 dark:text-green-400" />
             </div>
           </CardHeader>
           <CardContent>
@@ -75,11 +74,11 @@ export default async function DashboardPage() {
             <p className="text-xs text-muted-foreground mt-0.5">plans generated</p>
           </CardContent>
         </Card>
-        <Card className="card-hover">
+        <Card className="card-hover card-accent-amber">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-semibold text-muted-foreground">Recent Progress</CardTitle>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100">
-              <BarChart3 className="h-4 w-4 text-amber-600" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30">
+              <BarChart3 className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             </div>
           </CardHeader>
           <CardContent>
@@ -87,11 +86,11 @@ export default async function DashboardPage() {
             <p className="text-xs text-muted-foreground mt-0.5">entries this week</p>
           </CardContent>
         </Card>
-        <Card className="card-hover">
+        <Card className="card-hover card-accent-orange">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-semibold text-muted-foreground">Logging Streak</CardTitle>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100">
-              <Flame className="h-4 w-4 text-orange-500" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/30">
+              <Flame className="h-4 w-4 text-orange-500 dark:text-orange-400" />
             </div>
           </CardHeader>
           <CardContent>
