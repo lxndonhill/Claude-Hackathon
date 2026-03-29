@@ -3,14 +3,24 @@ import { ChildProfile } from '@/types/child'
 export const SYSTEM_PROMPT = `You are an expert autism education specialist with deep knowledge of:
 - Applied Behavior Analysis (ABA) and evidence-based autism interventions
 - Differentiated instruction for students on the autism spectrum
-- DSM-5 support levels and corresponding educational strategies
+- Support levels and corresponding educational strategies
 - Sensory processing differences and sensory-friendly teaching approaches
 - AAC (Augmentative and Alternative Communication) strategies
 - Visual supports and structured teaching (TEACCH methodology)
 - Social stories and social skills curricula
 - Self-regulation strategies (Zones of Regulation, etc.)
 
-Your role is to create highly personalized, practical learning plans that educators and parents can immediately implement. Always base recommendations on the specific child's profile — their strengths, challenges, communication style, sensory preferences, learning style, and special interests.
+Your role is to create highly personalized, practical learning support plans that educators and parents can immediately implement. Always base recommendations on the specific student's profile — their strengths, areas for growth, communication style, sensory preferences, learning style, and special interests.
+
+LANGUAGE GUIDELINES:
+- Use strengths-based, person-first language throughout
+- Frame challenges as "areas for growth" or "areas where the student benefits from support"
+- Avoid clinical diagnostic terminology — write for educators and families, not clinicians
+- Lead with what the student CAN do and HOW their strengths can be leveraged
+
+PRIVACY: The student profile you receive does NOT include the student's name. Refer to the student as "the student" throughout the plan.
+
+RATIONALE REQUIREMENT: For every goal and every strategy, you MUST include a "rationale" field explaining WHY this specific recommendation fits THIS student's unique profile. Reference their specific strengths, interests, sensory preferences, or areas for growth in the rationale.
 
 IMPORTANT: You MUST respond with valid JSON only. No markdown, no explanation, just the JSON object.`
 
@@ -21,43 +31,47 @@ export function buildLearningPlanPrompt(
 ): string {
   const age = calculateAge(child.dateOfBirth)
 
-  return `Create a personalized learning plan for a student with autism based on this profile:
+  // PRIVACY SAFEGUARD: Child name is intentionally excluded from this prompt.
+  // Only anonymised profile data is sent to the Claude API.
+  return `Create a personalized learning support plan for a student based on this profile:
 
 STUDENT PROFILE:
 - Age: ${age} years old (${formatAgeGroup(child.ageGroup)})
-- DSM-5 Support Level: ${formatSupportLevel(child.supportLevel)}
+- Support Level: ${formatSupportLevel(child.supportLevel)}
 - Communication Style: ${formatCommunicationStyle(child.communicationStyle)}
 - Learning Style: ${child.learningStyle}
 - Strengths: ${child.strengths.join(', ') || 'Not specified'}
-- Challenges: ${child.challenges.join(', ') || 'Not specified'}
-- Sensory Preferences:
+- Areas for Growth: ${child.challenges.join(', ') || 'Not specified'}
+- Sensory Profile:
   - Avoids: ${child.sensoryPreferences.avoids.join(', ') || 'None noted'}
   - Seeks: ${child.sensoryPreferences.seeks.join(', ') || 'None noted'}
 - Special Interests: ${child.interests.join(', ') || 'Not specified'}
-${child.diagnosisDetails ? `- Additional Diagnosis Notes: ${child.diagnosisDetails}` : ''}
+${child.diagnosisDetails ? `- Additional Support Information: ${child.diagnosisDetails}` : ''}
 ${child.notes ? `- Educator Notes: ${child.notes}` : ''}
 
 FOCUS AREA: ${focusArea}
 ${additionalContext ? `\nADDITIONAL CONTEXT FROM EDUCATOR: ${additionalContext}` : ''}
 
-Generate a comprehensive learning plan. Respond with ONLY this JSON structure:
+Generate a comprehensive learning support plan. Respond with ONLY this JSON structure:
 
 {
   "title": "Descriptive plan title",
   "goals": [
     {
       "id": "g1",
-      "description": "Specific, measurable goal",
+      "description": "Specific, measurable goal using strengths-based language",
       "measurementCriteria": "How to measure success (e.g., 4 out of 5 trials)",
-      "timeframe": "Expected timeframe (e.g., 6-8 weeks)"
+      "timeframe": "Expected timeframe (e.g., 6-8 weeks)",
+      "rationale": "WHY this goal fits this specific student — reference their profile strengths, interests, or areas for growth"
     }
   ],
   "strategies": [
     {
       "id": "s1",
       "title": "Strategy name",
-      "description": "Detailed description of how to implement",
-      "frequency": "How often to use (e.g., Daily, 3x per week)"
+      "description": "Detailed description of how to implement this strategy",
+      "frequency": "How often to use (e.g., Daily, 3x per week)",
+      "rationale": "WHY this strategy is well-suited for this specific student — reference their learning style, sensory preferences, or special interests"
     }
   ],
   "accommodations": [
@@ -79,7 +93,7 @@ Generate a comprehensive learning plan. Respond with ONLY this JSON structure:
   ]
 }
 
-Include 3-5 goals, 4-6 strategies, 4-6 accommodations, 3-5 materials, and 2-3 assessment methods. Make all recommendations specific to this student's profile, leveraging their strengths and interests.`
+Include 3-5 goals, 4-6 strategies, 4-6 accommodations, 3-5 materials, and 2-3 assessment methods. Make all recommendations specific to this student's profile, leveraging their strengths and interests. Use supportive, non-diagnostic language throughout.`
 }
 
 function calculateAge(dateOfBirth: string): number {
@@ -105,9 +119,9 @@ function formatAgeGroup(ageGroup: string): string {
 
 function formatSupportLevel(level: string): string {
   const map: Record<string, string> = {
-    LEVEL_1: 'Level 1 - Requiring Support',
-    LEVEL_2: 'Level 2 - Requiring Substantial Support',
-    LEVEL_3: 'Level 3 - Requiring Very Substantial Support',
+    LEVEL_1: 'Level 1 — Requiring Support',
+    LEVEL_2: 'Level 2 — Requiring Substantial Support',
+    LEVEL_3: 'Level 3 — Requiring Very Substantial Support',
   }
   return map[level] ?? level
 }

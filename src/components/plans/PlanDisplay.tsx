@@ -1,27 +1,85 @@
 'use client'
 
+import { useState } from 'react'
 import { LearningPlan } from '@/types/plan'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Printer, Target, Lightbulb, Settings, Package, Calendar, ClipboardCheck } from 'lucide-react'
+import {
+  Printer, Target, Lightbulb, Settings, Package,
+  Calendar, ClipboardCheck, Sparkles, ChevronDown, ChevronUp, X, RotateCcw,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+function RationaleBlock({ rationale }: { rationale: string }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="mt-2">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+      >
+        <Sparkles className="h-3 w-3" />
+        Why Lumen suggested this
+        {open ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+      </button>
+      {open && (
+        <p className="mt-1.5 rounded-lg bg-primary/5 p-2.5 text-xs leading-relaxed text-muted-foreground border border-primary/10">
+          {rationale}
+        </p>
+      )}
+    </div>
+  )
+}
 
 export function PlanDisplay({ plan }: { plan: LearningPlan }) {
+  const [rejectedGoals, setRejectedGoals] = useState<Set<string>>(new Set())
+  const [rejectedStrategies, setRejectedStrategies] = useState<Set<string>>(new Set())
+  const [rejectedAccommodations, setRejectedAccommodations] = useState<Set<number>>(new Set())
+
+  const toggleGoal = (id: string) =>
+    setRejectedGoals((s) => {
+      const n = new Set(s)
+      if (n.has(id)) { n.delete(id) } else { n.add(id) }
+      return n
+    })
+  const toggleStrategy = (id: string) =>
+    setRejectedStrategies((s) => {
+      const n = new Set(s)
+      if (n.has(id)) { n.delete(id) } else { n.add(id) }
+      return n
+    })
+  const toggleAccommodation = (i: number) =>
+    setRejectedAccommodations((s) => {
+      const n = new Set(s)
+      if (n.has(i)) { n.delete(i) } else { n.add(i) }
+      return n
+    })
+
+  const acceptedGoals = plan.goals.filter((g) => !rejectedGoals.has(g.id)).length
+  const acceptedStrategies = plan.strategies.filter((s) => !rejectedStrategies.has(s.id)).length
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">{plan.title}</h2>
-          <div className="mt-1 flex items-center gap-2">
-            <Badge>{plan.focusArea}</Badge>
-            <span className="text-sm text-gray-500">
+          <h2 className="text-xl font-extrabold text-foreground">{plan.title}</h2>
+          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+            <Badge className="font-semibold">{plan.focusArea}</Badge>
+            <span className="text-sm text-muted-foreground">
               Generated {new Date(plan.createdAt).toLocaleDateString()}
             </span>
+            {(rejectedGoals.size > 0 || rejectedStrategies.size > 0 || rejectedAccommodations.size > 0) && (
+              <Badge variant="secondary" className="text-xs">
+                {rejectedGoals.size + rejectedStrategies.size + rejectedAccommodations.size} overridden
+              </Badge>
+            )}
           </div>
         </div>
         <Button
           variant="outline"
-          className="gap-2"
+          className="gap-2 no-print"
           onClick={() => window.print()}
         >
           <Printer className="h-4 w-4" />
@@ -29,31 +87,68 @@ export function PlanDisplay({ plan }: { plan: LearningPlan }) {
         </Button>
       </div>
 
+      {/* Educational disclaimer */}
+      <div className="rounded-xl border border-amber-200 bg-amber-50/50 px-4 py-3 text-xs text-amber-800">
+        <strong>Educator review required:</strong> These suggestions are AI-generated starting points based on research-informed strategies. Use your professional judgement — you can override or dismiss any item below.
+      </div>
+
       <div className="grid gap-6 print:gap-4">
+        {/* Goals */}
         {plan.goals.length > 0 && (
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Target className="h-4 w-4 text-blue-600" />
-                Goals
+              <CardTitle className="flex items-center justify-between text-base">
+                <span className="flex items-center gap-2">
+                  <Target className="h-4 w-4 text-primary" />
+                  Goals
+                </span>
+                <span className="text-xs font-normal text-muted-foreground">
+                  {acceptedGoals}/{plan.goals.length} accepted
+                </span>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ol className="space-y-4">
+              <ol className="space-y-5">
                 {plan.goals.map((goal, i) => (
-                  <li key={goal.id} className="flex gap-3">
-                    <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
+                  <li
+                    key={goal.id}
+                    className={cn(
+                      'flex gap-3 rounded-xl p-3 transition-all',
+                      rejectedGoals.has(goal.id)
+                        ? 'bg-muted/40 opacity-50'
+                        : 'bg-transparent'
+                    )}
+                  >
+                    <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                       {i + 1}
                     </span>
-                    <div>
-                      <p className="font-medium text-gray-900">{goal.description}</p>
-                      <p className="text-sm text-gray-500">
-                        <span className="font-medium">Measure:</span> {goal.measurementCriteria}
+                    <div className="flex-1 min-w-0">
+                      <p className={cn('font-semibold text-foreground', rejectedGoals.has(goal.id) && 'line-through text-muted-foreground')}>
+                        {goal.description}
                       </p>
-                      <p className="text-sm text-gray-500">
-                        <span className="font-medium">Timeframe:</span> {goal.timeframe}
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        <span className="font-semibold">Measure:</span> {goal.measurementCriteria}
                       </p>
+                      <p className="text-sm text-muted-foreground">
+                        <span className="font-semibold">Timeframe:</span> {goal.timeframe}
+                      </p>
+                      {goal.rationale && !rejectedGoals.has(goal.id) && (
+                        <RationaleBlock rationale={goal.rationale} />
+                      )}
                     </div>
+                    <button
+                      type="button"
+                      title={rejectedGoals.has(goal.id) ? 'Restore goal' : 'Override goal'}
+                      onClick={() => toggleGoal(goal.id)}
+                      className={cn(
+                        'flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-lg transition-colors no-print',
+                        rejectedGoals.has(goal.id)
+                          ? 'bg-primary/10 text-primary hover:bg-primary/20'
+                          : 'text-muted-foreground hover:bg-destructive/10 hover:text-destructive'
+                      )}
+                    >
+                      {rejectedGoals.has(goal.id) ? <RotateCcw className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
+                    </button>
                   </li>
                 ))}
               </ol>
@@ -61,23 +156,57 @@ export function PlanDisplay({ plan }: { plan: LearningPlan }) {
           </Card>
         )}
 
+        {/* Strategies */}
         {plan.strategies.length > 0 && (
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Lightbulb className="h-4 w-4 text-yellow-600" />
-                Strategies
+              <CardTitle className="flex items-center justify-between text-base">
+                <span className="flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-amber-500" />
+                  Strategies
+                </span>
+                <span className="text-xs font-normal text-muted-foreground">
+                  {acceptedStrategies}/{plan.strategies.length} accepted
+                </span>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 sm:grid-cols-2">
                 {plan.strategies.map((strategy) => (
-                  <div key={strategy.id} className="rounded-lg border bg-gray-50 p-4">
-                    <p className="font-medium text-gray-900">{strategy.title}</p>
+                  <div
+                    key={strategy.id}
+                    className={cn(
+                      'rounded-xl border p-4 transition-all relative',
+                      rejectedStrategies.has(strategy.id)
+                        ? 'bg-muted/40 opacity-50'
+                        : 'bg-secondary/30'
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className={cn('font-semibold text-foreground', rejectedStrategies.has(strategy.id) && 'line-through text-muted-foreground')}>
+                        {strategy.title}
+                      </p>
+                      <button
+                        type="button"
+                        title={rejectedStrategies.has(strategy.id) ? 'Restore strategy' : 'Override strategy'}
+                        onClick={() => toggleStrategy(strategy.id)}
+                        className={cn(
+                          'flex-shrink-0 flex h-6 w-6 items-center justify-center rounded-lg transition-colors no-print',
+                          rejectedStrategies.has(strategy.id)
+                            ? 'bg-primary/10 text-primary hover:bg-primary/20'
+                            : 'text-muted-foreground hover:bg-destructive/10 hover:text-destructive'
+                        )}
+                      >
+                        {rejectedStrategies.has(strategy.id) ? <RotateCcw className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                      </button>
+                    </div>
                     {strategy.frequency && (
                       <Badge variant="secondary" className="mt-1 text-xs">{strategy.frequency}</Badge>
                     )}
-                    <p className="mt-2 text-sm text-gray-600">{strategy.description}</p>
+                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{strategy.description}</p>
+                    {strategy.rationale && !rejectedStrategies.has(strategy.id) && (
+                      <RationaleBlock rationale={strategy.rationale} />
+                    )}
                   </div>
                 ))}
               </div>
@@ -85,20 +214,45 @@ export function PlanDisplay({ plan }: { plan: LearningPlan }) {
           </Card>
         )}
 
+        {/* Accommodations */}
         {plan.accommodations.length > 0 && (
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
                 <Settings className="h-4 w-4 text-green-600" />
-                Accommodations
+                Accommodations & Supports
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
                 {plan.accommodations.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm">
-                    <span className="mt-0.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-500" />
-                    {item}
+                  <li
+                    key={i}
+                    className={cn(
+                      'flex items-center gap-2 text-sm rounded-lg p-2 transition-all',
+                      rejectedAccommodations.has(i) ? 'opacity-50' : ''
+                    )}
+                  >
+                    <span className={cn(
+                      'mt-0.5 h-1.5 w-1.5 flex-shrink-0 rounded-full',
+                      rejectedAccommodations.has(i) ? 'bg-muted-foreground' : 'bg-green-500'
+                    )} />
+                    <span className={cn('flex-1', rejectedAccommodations.has(i) && 'line-through text-muted-foreground')}>
+                      {item}
+                    </span>
+                    <button
+                      type="button"
+                      title={rejectedAccommodations.has(i) ? 'Restore' : 'Override'}
+                      onClick={() => toggleAccommodation(i)}
+                      className={cn(
+                        'flex-shrink-0 flex h-5 w-5 items-center justify-center rounded transition-colors no-print',
+                        rejectedAccommodations.has(i)
+                          ? 'text-primary hover:bg-primary/10'
+                          : 'text-muted-foreground hover:text-destructive'
+                      )}
+                    >
+                      {rejectedAccommodations.has(i) ? <RotateCcw className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -118,7 +272,7 @@ export function PlanDisplay({ plan }: { plan: LearningPlan }) {
               <CardContent>
                 <ul className="space-y-2">
                   {plan.materials.map((item, i) => (
-                    <li key={i} className="text-sm text-gray-700">
+                    <li key={i} className="text-sm text-muted-foreground">
                       • {item}
                     </li>
                   ))}
@@ -138,7 +292,7 @@ export function PlanDisplay({ plan }: { plan: LearningPlan }) {
               <CardContent>
                 <ul className="space-y-2">
                   {plan.assessmentMethods.map((item, i) => (
-                    <li key={i} className="text-sm text-gray-700">
+                    <li key={i} className="text-sm text-muted-foreground">
                       • {item}
                     </li>
                   ))}
@@ -152,7 +306,7 @@ export function PlanDisplay({ plan }: { plan: LearningPlan }) {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
-                <Calendar className="h-4 w-4 text-blue-600" />
+                <Calendar className="h-4 w-4 text-primary" />
                 Weekly Structure
               </CardTitle>
             </CardHeader>
@@ -162,17 +316,17 @@ export function PlanDisplay({ plan }: { plan: LearningPlan }) {
                   const content = plan.weeklyStructure[day]
                   if (!content) return null
                   return (
-                    <div key={day} className="rounded-lg bg-blue-50 p-3">
-                      <p className="mb-1 text-xs font-bold uppercase tracking-wide text-blue-600">
+                    <div key={day} className="rounded-xl bg-primary/5 p-3 border border-primary/10">
+                      <p className="mb-1 text-xs font-extrabold uppercase tracking-wide text-primary">
                         {day}
                       </p>
-                      <p className="text-sm text-gray-700">{content}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{content}</p>
                     </div>
                   )
                 })}
               </div>
               {plan.weeklyStructure.notes && (
-                <p className="mt-3 text-sm text-gray-500">{plan.weeklyStructure.notes}</p>
+                <p className="mt-3 text-sm text-muted-foreground">{plan.weeklyStructure.notes}</p>
               )}
             </CardContent>
           </Card>

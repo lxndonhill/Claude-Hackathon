@@ -14,7 +14,7 @@ export default async function EditChildPage({ params }: { params: { childId: str
 
   if (!child) notFound()
 
-  const childProfile: ChildProfile = {
+  const childProfile = {
     ...child,
     strengths: JSON.parse(child.strengths),
     challenges: JSON.parse(child.challenges),
@@ -23,7 +23,7 @@ export default async function EditChildPage({ params }: { params: { childId: str
     dateOfBirth: child.dateOfBirth.toISOString(),
     createdAt: child.createdAt.toISOString(),
     updatedAt: child.updatedAt.toISOString(),
-  }
+  } as ChildProfile
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">

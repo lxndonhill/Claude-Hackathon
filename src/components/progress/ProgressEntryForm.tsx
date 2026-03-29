@@ -83,7 +83,7 @@ export function ProgressEntryForm({ childId, planId, onSuccess }: Props) {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Rating *</Label>
-              <Select value={form.rating} onValueChange={(v) => update('rating', v)} required>
+              <Select value={form.rating} onValueChange={(v) => update('rating', v ?? '')} required>
                 <SelectTrigger>
                   <SelectValue placeholder="Select rating" />
                 </SelectTrigger>

@@ -276,12 +276,12 @@ export function ChildProfileForm({ child, onSuccess }: Props) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="diagnosis">Diagnosis Details</Label>
+            <Label htmlFor="diagnosis">Additional Support Information</Label>
             <Textarea
               id="diagnosis"
               value={form.diagnosisDetails ?? ''}
               onChange={(e) => update('diagnosisDetails', e.target.value)}
-              placeholder="Any relevant diagnosis details (optional)"
+              placeholder="Any relevant information about this child's support needs (optional)"
               rows={3}
             />
           </div>

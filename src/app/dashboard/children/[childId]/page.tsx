@@ -3,11 +3,12 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
-import { Brain, Calendar, BarChart3, Pencil } from 'lucide-react'
+import { Brain, Calendar, BarChart3, Pencil, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { EmptyState } from '@/components/shared/EmptyState'
 
 export default async function ChildDetailPage({ params }: { params: { childId: string } }) {
   const session = await getServerSession(authOptions)
@@ -35,17 +36,19 @@ export default async function ChildDetailPage({ params }: { params: { childId: s
     return a
   })()
 
+  const supportLabel = child.supportLevel.replace('LEVEL_', 'Level ')
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between">
+    <div className="space-y-6 page-enter">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{child.name}</h1>
-          <p className="text-gray-500">{age} years old · Support Level {child.supportLevel.replace('LEVEL_', '')}</p>
+          <h1 className="text-2xl font-extrabold text-foreground">{child.name}</h1>
+          <p className="text-muted-foreground">{age} years old · Support {supportLabel}</p>
         </div>
         <Link href={`/dashboard/children/${child.id}/edit`}>
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2 font-semibold">
             <Pencil className="h-4 w-4" />
-            Edit
+            Edit profile
           </Button>
         </Link>
       </div>
@@ -54,12 +57,12 @@ export default async function ChildDetailPage({ params }: { params: { childId: s
         {strengths.length > 0 && (
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Strengths</CardTitle>
+              <CardTitle className="text-sm font-semibold text-muted-foreground">Strengths</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-wrap gap-1.5">
                 {strengths.map((s) => (
-                  <Badge key={s} className="bg-green-100 text-green-700 hover:bg-green-100">{s}</Badge>
+                  <Badge key={s} className="bg-green-100 text-green-700 hover:bg-green-100 font-medium">{s}</Badge>
                 ))}
               </div>
             </CardContent>
@@ -68,12 +71,12 @@ export default async function ChildDetailPage({ params }: { params: { childId: s
         {challenges.length > 0 && (
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Challenges</CardTitle>
+              <CardTitle className="text-sm font-semibold text-muted-foreground">Areas for Growth</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-wrap gap-1.5">
                 {challenges.map((c) => (
-                  <Badge key={c} className="bg-orange-100 text-orange-700 hover:bg-orange-100">{c}</Badge>
+                  <Badge key={c} className="bg-amber-100 text-amber-700 hover:bg-amber-100 font-medium">{c}</Badge>
                 ))}
               </div>
             </CardContent>
@@ -82,12 +85,12 @@ export default async function ChildDetailPage({ params }: { params: { childId: s
         {interests.length > 0 && (
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Interests</CardTitle>
+              <CardTitle className="text-sm font-semibold text-muted-foreground">Special Interests</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-wrap gap-1.5">
                 {interests.map((i) => (
-                  <Badge key={i} variant="secondary">{i}</Badge>
+                  <Badge key={i} variant="secondary" className="font-medium">{i}</Badge>
                 ))}
               </div>
             </CardContent>
@@ -96,14 +99,14 @@ export default async function ChildDetailPage({ params }: { params: { childId: s
       </div>
 
       <Tabs defaultValue="plans">
-        <TabsList>
-          <TabsTrigger value="plans" className="gap-2">
+        <TabsList className="h-auto flex-wrap gap-1 p-1">
+          <TabsTrigger value="plans" className="gap-1.5 font-semibold">
             <Brain className="h-4 w-4" /> Plans ({child.learningPlans.length})
           </TabsTrigger>
-          <TabsTrigger value="schedules" className="gap-2">
+          <TabsTrigger value="schedules" className="gap-1.5 font-semibold">
             <Calendar className="h-4 w-4" /> Schedules ({child.schedules.length})
           </TabsTrigger>
-          <TabsTrigger value="progress" className="gap-2">
+          <TabsTrigger value="progress" className="gap-1.5 font-semibold">
             <BarChart3 className="h-4 w-4" /> Progress ({child.progressEntries.length})
           </TabsTrigger>
         </TabsList>
@@ -111,21 +114,29 @@ export default async function ChildDetailPage({ params }: { params: { childId: s
         <TabsContent value="plans" className="mt-4 space-y-3">
           <div className="flex justify-end">
             <Link href={`/dashboard/children/${child.id}/plans/new`}>
-              <Button size="sm">Generate new plan</Button>
+              <Button size="sm" className="gap-1.5 font-semibold">
+                <Plus className="h-4 w-4" /> Generate new plan
+              </Button>
             </Link>
           </div>
           {child.learningPlans.length === 0 ? (
-            <p className="py-8 text-center text-gray-500">No learning plans yet</p>
+            <EmptyState
+              icon={Brain}
+              title="No learning plans yet"
+              description="Generate an AI-powered learning support plan tailored to this student's profile, strengths, and interests."
+              actionLabel="Generate first plan"
+              actionHref={`/dashboard/children/${child.id}/plans/new`}
+            />
           ) : (
             child.learningPlans.map((plan) => (
               <Link key={plan.id} href={`/dashboard/children/${child.id}/plans/${plan.id}`}>
-                <Card className="cursor-pointer hover:shadow-sm">
+                <Card className="card-hover cursor-pointer">
                   <CardContent className="flex items-center justify-between py-4">
                     <div>
-                      <p className="font-medium">{plan.title}</p>
-                      <p className="text-sm text-gray-500">{plan.focusArea}</p>
+                      <p className="font-semibold text-foreground">{plan.title}</p>
+                      <p className="text-sm text-muted-foreground">{plan.focusArea}</p>
                     </div>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-muted-foreground">
                       {new Date(plan.createdAt).toLocaleDateString()}
                     </p>
                   </CardContent>
@@ -138,21 +149,29 @@ export default async function ChildDetailPage({ params }: { params: { childId: s
         <TabsContent value="schedules" className="mt-4 space-y-3">
           <div className="flex justify-end">
             <Link href={`/dashboard/children/${child.id}/schedules/new`}>
-              <Button size="sm">Create schedule</Button>
+              <Button size="sm" className="gap-1.5 font-semibold">
+                <Plus className="h-4 w-4" /> Create schedule
+              </Button>
             </Link>
           </div>
           {child.schedules.length === 0 ? (
-            <p className="py-8 text-center text-gray-500">No schedules yet</p>
+            <EmptyState
+              icon={Calendar}
+              title="No schedules yet"
+              description="Build a visual daily schedule to help this student navigate their day with predictability and confidence."
+              actionLabel="Build first schedule"
+              actionHref={`/dashboard/children/${child.id}/schedules/new`}
+            />
           ) : (
             child.schedules.map((s) => (
               <Link key={s.id} href={`/dashboard/children/${child.id}/schedules/${s.id}`}>
-                <Card className="cursor-pointer hover:shadow-sm">
+                <Card className="card-hover cursor-pointer">
                   <CardContent className="flex items-center justify-between py-4">
                     <div>
-                      <p className="font-medium">{s.title}</p>
-                      <p className="text-sm text-gray-500">{s.dayOfWeek}</p>
+                      <p className="font-semibold text-foreground">{s.title}</p>
+                      <p className="text-sm text-muted-foreground">{s.dayOfWeek}</p>
                     </div>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-muted-foreground">
                       {new Date(s.createdAt).toLocaleDateString()}
                     </p>
                   </CardContent>
@@ -165,20 +184,26 @@ export default async function ChildDetailPage({ params }: { params: { childId: s
         <TabsContent value="progress" className="mt-4 space-y-3">
           <div className="flex justify-end">
             <Link href={`/dashboard/children/${child.id}/progress`}>
-              <Button size="sm">View full progress</Button>
+              <Button size="sm" className="font-semibold">View full progress</Button>
             </Link>
           </div>
           {child.progressEntries.length === 0 ? (
-            <p className="py-8 text-center text-gray-500">No progress entries yet</p>
+            <EmptyState
+              icon={BarChart3}
+              title="No progress entries yet"
+              description="Start logging progress toward learning goals to build a picture of growth over time."
+              actionLabel="View progress tracker"
+              actionHref={`/dashboard/children/${child.id}/progress`}
+            />
           ) : (
             child.progressEntries.map((e) => (
               <Card key={e.id}>
                 <CardContent className="flex items-center justify-between py-4">
                   <div>
-                    <p className="font-medium text-sm">{e.goalDescription}</p>
-                    <p className="text-xs text-gray-500">Rating: {e.rating}/5</p>
+                    <p className="font-semibold text-sm text-foreground">{e.goalDescription}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Rating: {e.rating}/5</p>
                   </div>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-muted-foreground flex-shrink-0">
                     {new Date(e.date).toLocaleDateString()}
                   </p>
                 </CardContent>

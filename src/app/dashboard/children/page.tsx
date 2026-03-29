@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Plus, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ChildCard } from '@/components/children/ChildCard'
-import { ChildProfile } from '@/types/child'
+import { EmptyState } from '@/components/shared/EmptyState'
 
 export default async function ChildrenPage() {
   const session = await getServerSession(authOptions)
@@ -15,7 +15,8 @@ export default async function ChildrenPage() {
     orderBy: { createdAt: 'desc' },
   })
 
-  const children: ChildProfile[] = raw.map((c) => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const children: any[] = raw.map((c) => ({
     ...c,
     strengths: JSON.parse(c.strengths),
     challenges: JSON.parse(c.challenges),
@@ -27,11 +28,11 @@ export default async function ChildrenPage() {
   }))
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Children</h1>
-        <Link href="/dashboard/children/new">
-          <Button className="gap-2">
+    <div className="space-y-6 page-enter">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-extrabold text-foreground">Students</h1>
+        <Link href="/dashboard/children/new/consent">
+          <Button className="gap-2 font-semibold">
             <Plus className="h-4 w-4" />
             Add child
           </Button>
@@ -39,16 +40,13 @@ export default async function ChildrenPage() {
       </div>
 
       {children.length === 0 ? (
-        <div className="rounded-2xl border-2 border-dashed border-gray-200 p-16 text-center">
-          <Users className="mx-auto mb-4 h-12 w-12 text-gray-300" />
-          <h3 className="mb-2 text-lg font-medium text-gray-900">No children yet</h3>
-          <p className="mb-6 text-gray-500">
-            Add a child profile to start generating personalized learning plans
-          </p>
-          <Link href="/dashboard/children/new">
-            <Button>Add your first child</Button>
-          </Link>
-        </div>
+        <EmptyState
+          icon={Users}
+          title="No students yet"
+          description="Add a child profile to start generating personalized learning support plans, building visual schedules, and tracking progress."
+          actionLabel="Add your first student"
+          actionHref="/dashboard/children/new/consent"
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {children.map((child) => (

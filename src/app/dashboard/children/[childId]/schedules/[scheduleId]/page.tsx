@@ -21,12 +21,12 @@ export default async function ScheduleDetailPage({
     notFound()
   }
 
-  const schedule: Schedule = {
+  const schedule = {
     ...raw,
     blocks: JSON.parse(raw.blocks),
     createdAt: raw.createdAt.toISOString(),
     updatedAt: raw.updatedAt.toISOString(),
-  }
+  } as Schedule
 
   return (
     <div className="space-y-6">

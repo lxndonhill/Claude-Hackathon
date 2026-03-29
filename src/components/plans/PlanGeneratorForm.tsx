@@ -43,7 +43,7 @@ export function PlanGeneratorForm({ child }: Props) {
 
       const plan = await res.json()
       router.push(`/dashboard/children/${child.id}/plans/${plan.id}`)
-    } catch (err) {
+    } catch {
       setError('Network error — please check your connection and try again')
     } finally {
       setLoading(false)
@@ -105,7 +105,7 @@ export function PlanGeneratorForm({ child }: Props) {
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
             <Label>Focus Area *</Label>
-            <Select value={focusArea} onValueChange={setFocusArea} required>
+            <Select value={focusArea} onValueChange={(v) => setFocusArea(v ?? '')} required>
               <SelectTrigger>
                 <SelectValue placeholder="Select a focus area for this plan" />
               </SelectTrigger>
