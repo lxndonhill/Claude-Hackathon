@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
-import { BookOpen, LayoutDashboard, Users, LogOut, X } from 'lucide-react'
+import { BookOpen, LayoutDashboard, Users, LogOut, X, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard/children', label: 'Students', icon: Users },
+  { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ]
 
 interface SidebarProps {

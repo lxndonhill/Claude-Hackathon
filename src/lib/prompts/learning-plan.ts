@@ -1,5 +1,19 @@
 import { ChildProfile } from '@/types/child'
 
+export interface PreviousPlanSummary {
+  title: string
+  focusArea: string
+  goalDescriptions: string[]
+  createdAt: string
+}
+
+export interface PreviousProgressSummary {
+  goalDescription: string
+  rating: number
+  ratingLabel: string
+  date: string
+}
+
 export const SYSTEM_PROMPT = `You are an expert autism education specialist with deep knowledge of:
 - Applied Behavior Analysis (ABA) and evidence-based autism interventions
 - Differentiated instruction for students on the autism spectrum
@@ -27,7 +41,9 @@ IMPORTANT: You MUST respond with valid JSON only. No markdown, no explanation, j
 export function buildLearningPlanPrompt(
   child: ChildProfile,
   focusArea: string,
-  additionalContext?: string
+  additionalContext?: string,
+  previousPlans?: PreviousPlanSummary[],
+  previousProgress?: PreviousProgressSummary[]
 ): string {
   const age = calculateAge(child.dateOfBirth)
 
@@ -51,6 +67,13 @@ ${child.notes ? `- Educator Notes: ${child.notes}` : ''}
 
 FOCUS AREA: ${focusArea}
 ${additionalContext ? `\nADDITIONAL CONTEXT FROM EDUCATOR: ${additionalContext}` : ''}
+${previousPlans && previousPlans.length > 0 ? `
+PREVIOUS PLANS (build on these, avoid repeating goals already mastered):
+${previousPlans.map((p, i) => `${i + 1}. "${p.title}" (Focus: ${p.focusArea}, created ${new Date(p.createdAt).toLocaleDateString()})
+   Goals covered: ${p.goalDescriptions.slice(0, 3).join('; ')}${p.goalDescriptions.length > 3 ? ` +${p.goalDescriptions.length - 3} more` : ''}`).join('\n')}` : ''}
+${previousProgress && previousProgress.length > 0 ? `
+RECENT PROGRESS DATA (use to inform where the student currently is):
+${previousProgress.map((e) => `- ${e.goalDescription}: ${e.ratingLabel} (${e.rating}/5) on ${new Date(e.date).toLocaleDateString()}`).join('\n')}` : ''}
 
 Generate a comprehensive learning support plan. Respond with ONLY this JSON structure:
 

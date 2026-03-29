@@ -19,9 +19,9 @@ export interface CreateProgressEntryInput {
 }
 
 export const RATING_LABELS: Record<number, string> = {
-  1: 'Not Yet',
-  2: 'Emerging',
+  1: 'Just Starting',
+  2: 'Making Attempts',
   3: 'Developing',
-  4: 'Achieving',
-  5: 'Mastered',
+  4: 'Progressing Well',
+  5: 'Thriving',
 }

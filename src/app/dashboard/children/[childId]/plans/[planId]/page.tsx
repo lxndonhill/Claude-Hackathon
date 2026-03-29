@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { LearningPlan } from '@/types/plan'
 import { PlanDisplay } from '@/components/plans/PlanDisplay'
+import { LumenChatPanel } from '@/components/plans/LumenChatPanel'
 
 export default async function PlanDetailPage({
   params,
@@ -34,8 +35,9 @@ export default async function PlanDetailPage({
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <PlanDisplay plan={learningPlan} />
+    <div className="mx-auto max-w-4xl space-y-6">
+      <PlanDisplay plan={learningPlan} childId={params.childId} />
+      <LumenChatPanel plan={learningPlan} />
     </div>
   )
 }
