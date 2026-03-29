@@ -4,7 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { generatePlanSchema } from '@/lib/validators/plan'
 import { CLAUDE_MODEL } from '@/lib/anthropic'
-import { buildLearningPlanPrompt, SYSTEM_PROMPT } from '@/lib/prompts/learning-plan'
+import { buildLearningPlanPrompt, SYSTEM_PROMPT, PreviousPlanSummary, PreviousProgressSummary } from '@/lib/prompts/learning-plan'
+import { RATING_LABELS } from '@/types/progress'
 import { parsePlanResponse } from '@/lib/prompts/plan-parser'
 import { z } from 'zod'
 import { ChildProfile } from '@/types/child'
@@ -95,7 +96,7 @@ export async function POST(req: Request) {
       )
     }
 
-    // --- 4. Build prompt ---
+    // --- 4. Build prompt with previous context ---
     const childProfile: ChildProfile = {
       ...child,
       strengths: JSON.parse(child.strengths),
@@ -107,7 +108,43 @@ export async function POST(req: Request) {
       updatedAt: child.updatedAt.toISOString(),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any as ChildProfile
-    const userPrompt = buildLearningPlanPrompt(childProfile, data.focusArea, data.additionalContext)
+
+    const [prevPlansRaw, prevProgressRaw] = await Promise.all([
+      prisma.learningPlan.findMany({
+        where: { childId: data.childId },
+        orderBy: { createdAt: 'desc' },
+        take: 2,
+        select: { title: true, focusArea: true, goals: true, createdAt: true },
+      }),
+      prisma.progressEntry.findMany({
+        where: { childId: data.childId },
+        orderBy: { date: 'desc' },
+        take: 10,
+        select: { goalDescription: true, rating: true, date: true },
+      }),
+    ])
+
+    const previousPlans: PreviousPlanSummary[] = prevPlansRaw.map((p) => ({
+      title: p.title,
+      focusArea: p.focusArea,
+      goalDescriptions: (JSON.parse(p.goals) as { description: string }[]).map((g) => g.description),
+      createdAt: p.createdAt.toISOString(),
+    }))
+
+    const previousProgress: PreviousProgressSummary[] = prevProgressRaw.map((e) => ({
+      goalDescription: e.goalDescription,
+      rating: e.rating,
+      ratingLabel: RATING_LABELS[e.rating] ?? String(e.rating),
+      date: e.date.toISOString(),
+    }))
+
+    const userPrompt = buildLearningPlanPrompt(
+      childProfile,
+      data.focusArea,
+      data.additionalContext,
+      previousPlans,
+      previousProgress
+    )
 
     // --- 5. Call Claude API ---
     console.log('[plans/POST] Calling Claude API with model:', CLAUDE_MODEL)

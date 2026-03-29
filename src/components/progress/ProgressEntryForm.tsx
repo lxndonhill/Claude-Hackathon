@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { RATING_LABELS } from '@/types/progress'
+import { cn } from '@/lib/utils'
 
 interface Props {
   childId: string
@@ -80,32 +80,51 @@ export function ProgressEntryForm({ childId, planId, onSuccess }: Props) {
               required
             />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label>Rating *</Label>
-              <Select value={form.rating} onValueChange={(v) => update('rating', v ?? '')} required>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select rating" />
-                </SelectTrigger>
-                <SelectContent>
-                  {[1, 2, 3, 4, 5].map((r) => (
-                    <SelectItem key={r} value={String(r)}>
-                      {r} — {RATING_LABELS[r]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <div className="space-y-1.5">
+            <Label>How is it going? *</Label>
+            <div className="grid grid-cols-5 gap-2">
+              {([1, 2, 3, 4, 5] as const).map((r) => {
+                const colors: Record<number, string> = {
+                  1: 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100',
+                  2: 'border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100',
+                  3: 'border-yellow-200 bg-yellow-50 text-yellow-700 hover:bg-yellow-100',
+                  4: 'border-green-200 bg-green-50 text-green-700 hover:bg-green-100',
+                  5: 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100',
+                }
+                const selectedColors: Record<number, string> = {
+                  1: 'border-red-400 bg-red-100 text-red-800 ring-2 ring-red-300',
+                  2: 'border-orange-400 bg-orange-100 text-orange-800 ring-2 ring-orange-300',
+                  3: 'border-yellow-400 bg-yellow-100 text-yellow-800 ring-2 ring-yellow-300',
+                  4: 'border-green-400 bg-green-100 text-green-800 ring-2 ring-green-300',
+                  5: 'border-emerald-400 bg-emerald-100 text-emerald-800 ring-2 ring-emerald-300',
+                }
+                const isSelected = form.rating === String(r)
+                return (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => update('rating', String(r))}
+                    className={cn(
+                      'flex flex-col items-center gap-1 rounded-xl border-2 px-1 py-2.5 text-center transition-all',
+                      isSelected ? selectedColors[r] : colors[r]
+                    )}
+                  >
+                    <span className="text-lg font-extrabold">{r}</span>
+                    <span className="text-[10px] font-semibold leading-tight">{RATING_LABELS[r]}</span>
+                  </button>
+                )
+              })}
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="date">Date *</Label>
-              <Input
-                id="date"
-                type="date"
-                value={form.date}
-                onChange={(e) => update('date', e.target.value)}
-                required
-              />
-            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="date">Date *</Label>
+            <Input
+              id="date"
+              type="date"
+              value={form.date}
+              onChange={(e) => update('date', e.target.value)}
+              required
+            />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="notes">Notes (optional)</Label>

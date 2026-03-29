@@ -10,6 +10,7 @@ import {
   Calendar, ClipboardCheck, Sparkles, ChevronDown, ChevronUp, X, RotateCcw,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { AddToScheduleButton } from './AddToScheduleDialog'
 
 function RationaleBlock({ rationale }: { rationale: string }) {
   const [open, setOpen] = useState(false)
@@ -33,7 +34,7 @@ function RationaleBlock({ rationale }: { rationale: string }) {
   )
 }
 
-export function PlanDisplay({ plan }: { plan: LearningPlan }) {
+export function PlanDisplay({ plan, childId }: { plan: LearningPlan; childId?: string }) {
   const [rejectedGoals, setRejectedGoals] = useState<Set<string>>(new Set())
   const [rejectedStrategies, setRejectedStrategies] = useState<Set<string>>(new Set())
   const [rejectedAccommodations, setRejectedAccommodations] = useState<Set<number>>(new Set())
@@ -136,19 +137,24 @@ export function PlanDisplay({ plan }: { plan: LearningPlan }) {
                         <RationaleBlock rationale={goal.rationale} />
                       )}
                     </div>
-                    <button
-                      type="button"
-                      title={rejectedGoals.has(goal.id) ? 'Restore goal' : 'Override goal'}
-                      onClick={() => toggleGoal(goal.id)}
-                      className={cn(
-                        'flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-lg transition-colors no-print',
-                        rejectedGoals.has(goal.id)
-                          ? 'bg-primary/10 text-primary hover:bg-primary/20'
-                          : 'text-muted-foreground hover:bg-destructive/10 hover:text-destructive'
+                    <div className="flex flex-shrink-0 items-center gap-1 no-print">
+                      {childId && !rejectedGoals.has(goal.id) && (
+                        <AddToScheduleButton childId={childId} activityText={goal.description} />
                       )}
-                    >
-                      {rejectedGoals.has(goal.id) ? <RotateCcw className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
-                    </button>
+                      <button
+                        type="button"
+                        title={rejectedGoals.has(goal.id) ? 'Restore goal' : 'Override goal'}
+                        onClick={() => toggleGoal(goal.id)}
+                        className={cn(
+                          'flex h-7 w-7 items-center justify-center rounded-lg transition-colors',
+                          rejectedGoals.has(goal.id)
+                            ? 'bg-primary/10 text-primary hover:bg-primary/20'
+                            : 'text-muted-foreground hover:bg-destructive/10 hover:text-destructive'
+                        )}
+                      >
+                        {rejectedGoals.has(goal.id) ? <RotateCcw className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ol>
@@ -186,19 +192,24 @@ export function PlanDisplay({ plan }: { plan: LearningPlan }) {
                       <p className={cn('font-semibold text-foreground', rejectedStrategies.has(strategy.id) && 'line-through text-muted-foreground')}>
                         {strategy.title}
                       </p>
-                      <button
-                        type="button"
-                        title={rejectedStrategies.has(strategy.id) ? 'Restore strategy' : 'Override strategy'}
-                        onClick={() => toggleStrategy(strategy.id)}
-                        className={cn(
-                          'flex-shrink-0 flex h-6 w-6 items-center justify-center rounded-lg transition-colors no-print',
-                          rejectedStrategies.has(strategy.id)
-                            ? 'bg-primary/10 text-primary hover:bg-primary/20'
-                            : 'text-muted-foreground hover:bg-destructive/10 hover:text-destructive'
+                      <div className="flex flex-shrink-0 items-center gap-1 no-print">
+                        {childId && !rejectedStrategies.has(strategy.id) && (
+                          <AddToScheduleButton childId={childId} activityText={strategy.title} />
                         )}
-                      >
-                        {rejectedStrategies.has(strategy.id) ? <RotateCcw className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                      </button>
+                        <button
+                          type="button"
+                          title={rejectedStrategies.has(strategy.id) ? 'Restore strategy' : 'Override strategy'}
+                          onClick={() => toggleStrategy(strategy.id)}
+                          className={cn(
+                            'flex h-6 w-6 items-center justify-center rounded-lg transition-colors',
+                            rejectedStrategies.has(strategy.id)
+                              ? 'bg-primary/10 text-primary hover:bg-primary/20'
+                              : 'text-muted-foreground hover:bg-destructive/10 hover:text-destructive'
+                          )}
+                        >
+                          {rejectedStrategies.has(strategy.id) ? <RotateCcw className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                        </button>
+                      </div>
                     </div>
                     {strategy.frequency && (
                       <Badge variant="secondary" className="mt-1 text-xs">{strategy.frequency}</Badge>
