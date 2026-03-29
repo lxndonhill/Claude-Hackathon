@@ -2,11 +2,13 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
-import { Users, BookOpen, BarChart3, Plus, TrendingUp } from 'lucide-react'
+import { Users, BookOpen, BarChart3, Plus, TrendingUp, Flame } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { Badge } from '@/components/ui/badge'
+import { RATING_LABELS } from '@/types/progress'
+import { computeStreak } from '@/lib/streak'
 
 const RATING_COLORS: Record<number, string> = {
   1: 'bg-red-100 text-red-700',
@@ -19,7 +21,7 @@ const RATING_COLORS: Record<number, string> = {
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
 
-  const [childCount, planCount, recentEntries] = await Promise.all([
+  const [childCount, planCount, recentEntries, streak] = await Promise.all([
     prisma.child.count({ where: { userId: session!.user.id } }),
     prisma.learningPlan.count({ where: { child: { userId: session!.user.id } } }),
     prisma.progressEntry.findMany({
@@ -28,6 +30,7 @@ export default async function DashboardPage() {
       take: 5,
       include: { child: true },
     }),
+    computeStreak(session!.user.id),
   ])
 
   const firstName = session!.user.name.split(' ')[0]
@@ -47,7 +50,7 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
         <Card className="card-hover">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-semibold text-muted-foreground">Students</CardTitle>
@@ -84,6 +87,18 @@ export default async function DashboardPage() {
             <p className="text-xs text-muted-foreground mt-0.5">entries this week</p>
           </CardContent>
         </Card>
+        <Card className="card-hover">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-semibold text-muted-foreground">Logging Streak</CardTitle>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100">
+              <Flame className="h-4 w-4 text-orange-500" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-extrabold text-foreground">{streak}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{streak === 1 ? 'day in a row' : 'days in a row'}</p>
+          </CardContent>
+        </Card>
       </div>
 
       {recentEntries.length > 0 && (
@@ -104,7 +119,7 @@ export default async function DashboardPage() {
                   </div>
                   <div className="flex flex-shrink-0 items-center gap-2">
                     <Badge className={`text-xs ${RATING_COLORS[entry.rating] ?? 'bg-gray-100 text-gray-700'}`}>
-                      {entry.rating}/5
+                      {RATING_LABELS[entry.rating] ?? `${entry.rating}/5`}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
                       {new Date(entry.date).toLocaleDateString()}

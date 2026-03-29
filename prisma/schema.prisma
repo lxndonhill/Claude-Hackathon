@@ -8,14 +8,15 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  name         String
-  passwordHash String
-  role         String   @default("TEACHER")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  children     Child[]
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  name               String
+  passwordHash       String
+  role               String   @default("TEACHER")
+  textSizePreference String   @default("medium")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  children           Child[]
 }
 
 model Child {
