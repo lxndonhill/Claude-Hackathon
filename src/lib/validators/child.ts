@@ -19,9 +19,12 @@ export const communicationStyleValues = [
 export const learningStyleValues = [
   'VISUAL',
   'AUDITORY',
-  'KINESTHETIC',
   'READING_WRITING',
-  'MULTIMODAL',
+  'HANDS_ON',
+  'STRUCTURED',
+  'FLEXIBLE',
+  'ONE_ON_ONE',
+  'GROUP',
 ] as const
 
 export const sensoryPreferencesSchema = z.object({
@@ -41,7 +44,7 @@ export const createChildSchema = z.object({
   challenges: z.array(z.string()),
   sensoryPreferences: sensoryPreferencesSchema,
   communicationStyle: z.enum(communicationStyleValues),
-  learningStyle: z.enum(learningStyleValues),
+  learningStyle: z.array(z.enum(learningStyleValues)).min(1, 'Select at least one learning style'),
   interests: z.array(z.string()),
   notes: z.string().max(1000).optional(),
 })
