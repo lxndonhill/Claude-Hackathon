@@ -12,31 +12,145 @@ AI-powered learning plan generator for educators and parents supporting children
 
 ---
 
-## Prerequisites
+## Running Lumio Locally
 
-- Node.js 18+
-- npm
+Follow these steps to get the app running on your own computer. No prior experience required — just take it one step at a time!
+
+### Step 1 — Check your prerequisites
+
+You'll need two things installed before you start:
+
+- **Node.js** (version 18 or newer) — download from [nodejs.org](https://nodejs.org). Choose the "LTS" version.
+- **npm** — this comes bundled with Node.js automatically.
+
+To check if you already have them, open your terminal (on Mac: search for "Terminal", on Windows: search for "Command Prompt") and run:
+
+```bash
+node --version
+npm --version
+```
+
+If both print a version number, you're good to go.
 
 ---
 
-<!-- AUTO-GENERATED -->
-## Scripts
+### Step 2 — Clone the repository
 
-| Command | Description |
+In your terminal, navigate to the folder where you want to keep the project, then run:
+
+```bash
+git clone https://github.com/your-username/lumio.git
+cd lumio
+```
+
+(Replace the URL with the actual repo URL if different.)
+
+---
+
+### Step 3 — Install dependencies
+
+This downloads all the libraries the app needs:
+
+```bash
+npm install
+```
+
+It may take a minute or two. You'll see a progress bar.
+
+---
+
+### Step 4 — Set up your environment file
+
+The app needs a few secret values to work. Copy the example file to get started:
+
+```bash
+cp .env.example .env.local
+```
+
+Then open `.env.local` in any text editor and fill in the values:
+
+```
+ANTHROPIC_API_KEY=sk-ant-...       ← your API key (see Step 5)
+DATABASE_URL="file:./dev.db"       ← leave this as-is for local use
+NEXTAUTH_SECRET=any-random-string  ← make up any long random string
+NEXTAUTH_URL=http://localhost:3000 ← leave this as-is
+```
+
+---
+
+### Step 5 — Get an Anthropic API key
+
+Lumio uses Claude AI to generate learning plans and power the Lumen chat assistant. You'll need a free API key:
+
+1. Go to [console.anthropic.com](https://console.anthropic.com)
+2. Sign up or log in
+3. Click **API Keys** in the left sidebar
+4. Click **Create Key**, give it a name (e.g. "Lumio"), and copy the key
+5. Paste it into `.env.local` as the value for `ANTHROPIC_API_KEY`
+
+> Keep this key private — don't share it or commit it to git.
+
+---
+
+### Step 6 — Run database migrations
+
+This creates the local database file and sets up all the tables:
+
+```bash
+npx prisma migrate dev
+```
+
+When prompted for a migration name, you can just press Enter.
+
+---
+
+### Step 7 — Seed demo data
+
+This populates the app with three sample child profiles (Alex, Maya, and Jordan), each with a pre-built learning plan, schedule, and progress history so you can explore the app right away:
+
+```bash
+npm run seed
+```
+
+---
+
+### Step 8 — Start the app
+
+```bash
+npm run dev
+```
+
+Then open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+### Step 9 — Log in with the demo account
+
+Use these credentials to explore the pre-loaded demo data:
+
+| Field | Value |
+|-------|-------|
+| Email | `demo@lumio.app` |
+| Password | `demo1234` |
+
+You'll find three children already set up — Alex (social skills), Maya (communication), and Jordan (life skills) — each with a full learning plan, weekly schedule, and progress tracking history.
+
+---
+
+## Other Useful Commands
+
+| Command | What it does |
 |---------|-------------|
-| `npm run dev` | Start development server with hot reload |
-| `npm run build` | Production build with type checking |
-| `npm run start` | Run the production build locally |
-| `npm run lint` | Run ESLint |
-| `npm run seed` | Seed the database with sample data (`prisma/seed.ts`) |
-<!-- AUTO-GENERATED -->
+| `npm run dev` | Start the development server |
+| `npm run build` | Build for production |
+| `npm run seed` | Re-seed demo data (resets the demo account) |
+| `npx prisma studio` | Open a visual browser for your database |
+| `npx prisma migrate reset` | Wipe and rebuild the database from scratch |
 
 ---
 
 <!-- AUTO-GENERATED -->
 ## Environment Variables
-
-Copy `.env` (or create one from the values below) before running the app.
 
 | Variable | Required | Description | Example |
 |----------|----------|-------------|---------|
@@ -83,42 +197,8 @@ All routes require authentication (NextAuth session) unless noted.
 
 ---
 
-## Getting Started
-
-```bash
-# Install dependencies
-npm install
-
-# Set up environment
-cp .env .env.local   # edit values as needed
-
-# Initialize the database
-npx prisma migrate dev
-
-# (Optional) seed sample data
-npm run seed
-
-# Start dev server
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
----
-
 ## Database
 
 Uses SQLite via Prisma. Schema lives in `prisma/schema.prisma`.
-
-```bash
-# Apply migrations
-npx prisma migrate dev
-
-# Open Prisma Studio (GUI)
-npx prisma studio
-
-# Reset database
-npx prisma migrate reset
-```
 
 **Models:** `User` → `Child` → `LearningPlan`, `Schedule`, `ProgressEntry`
