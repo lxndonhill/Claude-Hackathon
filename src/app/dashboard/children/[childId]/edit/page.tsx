@@ -19,7 +19,7 @@ export default async function EditChildPage({ params }: { params: { childId: str
     strengths: JSON.parse(child.strengths),
     challenges: JSON.parse(child.challenges),
     sensoryPreferences: JSON.parse(child.sensoryPreferences),
-    learningStyle: child.learningStyle.split(',').filter(Boolean),
+    learningStyle: JSON.parse(child.learningStyle),
     interests: JSON.parse(child.interests),
     dateOfBirth: child.dateOfBirth.toISOString(),
     createdAt: child.createdAt.toISOString(),
