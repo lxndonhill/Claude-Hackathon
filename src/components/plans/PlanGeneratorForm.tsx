@@ -43,7 +43,7 @@ function LumenLoadingScreen() {
       setMsgIdx((i) => (i + 1) % messages.length)
     }, 2500)
     return () => clearInterval(interval)
-  }, [])
+  }, [messages.length])
 
   return (
     <div className="flex flex-col items-center gap-4 rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center">
